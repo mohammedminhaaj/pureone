@@ -11,48 +11,52 @@ class VerifyOtpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         forceMaterialTransparency: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              "assets/images/verify-otp.png",
-              colorBlendMode: BlendMode.multiply,
-            ),
-            const Text(
-              "Verify OTP",
-              style: TextStyle(fontSize: 35, fontWeight: FontWeight.w700),
-            ),
-            RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w300,
-                        color: Colors.black,
-                        fontSize: 20),
-                    children: <TextSpan>[
-                      const TextSpan(
-                          text: "A one-time password has been sent to "),
-                      TextSpan(
-                          text: mobile,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w400, fontSize: 21)),
-                    ])),
-            VerifyOtpForm(mobile: mobile),
-            const SizedBox(
-              height: 20,
-            ),
-            const AuthenticationScreenFooter(),
-          ],
-        ),
-      )
-          .animate()
-          .fadeIn(duration: 700.ms)
-          .moveY(duration: 700.ms, begin: -20, end: 0),
+      body: Container(
+        constraints: const BoxConstraints(maxWidth: 400),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                "assets/images/verify-otp.png",
+                colorBlendMode: BlendMode.multiply,
+              ),
+              const Text(
+                "Verify OTP",
+                style: TextStyle(fontSize: 35, fontWeight: FontWeight.w700),
+              ),
+              RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w300,
+                          color: Colors.black,
+                          fontSize: 20),
+                      children: <TextSpan>[
+                        const TextSpan(
+                            text: "A one-time password has been sent to "),
+                        TextSpan(
+                            text: mobile,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w400, fontSize: 21)),
+                      ])),
+              VerifyOtpForm(mobile: mobile),
+              const SizedBox(
+                height: 20,
+              ),
+              const AuthenticationScreenFooter(),
+            ],
+          ),
+        )
+            .animate()
+            .fadeIn(duration: 700.ms)
+            .moveY(duration: 700.ms, begin: -20, end: 0),
+      ),
     );
   }
 }

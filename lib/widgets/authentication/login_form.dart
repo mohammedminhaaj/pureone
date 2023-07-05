@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pureone/screens/forgot_password.dart';
+import 'package:pureone/screens/landing_page.dart';
 import 'package:pureone/screens/sign_up.dart';
 import 'package:pureone/settings.dart';
 import 'package:pureone/widgets/authentication/form_error.dart';
@@ -20,6 +22,8 @@ class _LoginFormState extends State<LoginForm> {
   String _password = "";
   Map<String, dynamic> _errorDict = {};
   bool isLoading = false;
+
+  final box = Hive.box("store");
 
   final _formKey = GlobalKey<FormState>();
 
@@ -57,6 +61,10 @@ class _LoginFormState extends State<LoginForm> {
           setState(() {
             _errorDict = data["errors"];
           });
+        } else {
+          box.put("token", data["auth_token"]);
+          Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (ctx) => const LandingPage()));
         }
       }).onError((error, stackTrace) {
         setState(() {

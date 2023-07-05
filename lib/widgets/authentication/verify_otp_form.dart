@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pureone/screens/landing_page.dart';
 import 'package:pureone/settings.dart';
 import 'package:pureone/widgets/authentication/form_error.dart';
 import 'package:pureone/widgets/authentication/resend_otp_button.dart';
@@ -27,6 +29,8 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
 
   Map<String, dynamic> _errorDict = {};
   bool isLoading = false;
+
+  final box = Hive.box("store");
 
   final _formKey = GlobalKey<FormState>();
 
@@ -61,7 +65,9 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
             _errorDict = data["errors"];
           });
         } else {
-          print(data);
+          box.put("token", data["auth_token"]);
+          Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (ctx) => const LandingPage()));
         }
       }).onError((error, stackTrace) {
         setState(() {

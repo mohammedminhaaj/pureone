@@ -1,11 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:pureone/screens/cart_screen.dart';
+import 'package:pureone/screens/favorite_screen.dart';
+import 'package:pureone/screens/home_screen.dart';
+import 'package:pureone/screens/profile_screen.dart';
 import 'package:pureone/widgets/bottom_nav_bar/bottom_nav_bar.dart';
-import 'package:pureone/widgets/carousel.dart';
-import 'package:pureone/widgets/categories.dart';
-import 'package:pureone/widgets/sort_menu.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class LandingPage extends StatefulWidget {
+  const LandingPage({super.key});
+
+  @override
+  State<LandingPage> createState() => _LandingPageState();
+}
+
+class _LandingPageState extends State<LandingPage> {
+  final Map<String, Widget> currentScreenMap = {
+    "Home": const HomeScreen(),
+    "Favorite": const FavoriteScreen(),
+    "Cart": const CartScreen(),
+    "Profile": const ProfileScreen(),
+  };
+
+  String currentScreen = "Home";
+
+  void changeCurrentScreen(String screenName) {
+    setState(() {
+      currentScreen = screenName;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,12 +66,11 @@ class HomeScreen extends StatelessWidget {
               ))
         ],
       ),
-      body: const SingleChildScrollView(
-        child: Column(
-          children: [Carousel(), SortMenu(), Categories()],
-        ),
+      body: currentScreenMap[currentScreen],
+      bottomNavigationBar: CustomeBottomNavigationBar(
+        onMenuSelected: changeCurrentScreen,
+        currentScreenName: currentScreen,
       ),
-      bottomNavigationBar: const CustomBottomNavigationBar(),
     );
   }
 }

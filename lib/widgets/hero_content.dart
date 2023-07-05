@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pureone/screens/login.dart';
 import 'package:pureone/utils/indicators.dart';
 
 class HeroContent extends StatelessWidget {
@@ -14,6 +16,13 @@ class HeroContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void onContinue() {
+      final box = Hive.box("store");
+      box.put("onboardingCompleted", true);
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (ctx) => const LoginScreen()));
+    }
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
@@ -101,7 +110,7 @@ class HeroContent extends StatelessWidget {
                               Theme.of(context).colorScheme.primary),
                           minimumSize: MaterialStateProperty.all<Size>(
                               const Size(400, 60))),
-                      onPressed: () {},
+                      onPressed: onContinue,
                       child: const Text('Continue'))
             ],
           ),

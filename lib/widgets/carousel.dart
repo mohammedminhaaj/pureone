@@ -38,6 +38,7 @@ class _CarouselState extends State<Carousel> {
   @override
   void dispose() {
     pageController.dispose();
+    carouselTimer?.cancel();
     super.dispose();
   }
 

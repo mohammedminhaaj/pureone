@@ -1,22 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pureone/screens/landing_page.dart';
 import 'package:pureone/screens/login.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pureone/screens/onboarding_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((fn) {
-    runApp(const MyApp());
+    Hive.initFlutter().then((fn) {
+      Hive.openBox("store").then((fn) {
+        runApp(const MyApp());
+      });
+    });
   });
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final box = Hive.box("store");
+    final bool onboardingCompleted =
+        box.get("onboardingCompleted", defaultValue: false);
+    final String userLoggedIn = box.get("token", defaultValue: "");
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -39,7 +50,11 @@ class MyApp extends StatelessWidget {
               seedColor: const Color.fromARGB(255, 0, 90, 125)),
           useMaterial3: true,
           textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme)),
-      home: const LoginScreen(),
+      home: !onboardingCompleted
+          ? const OnboardingScreen()
+          : userLoggedIn == ""
+              ? const LoginScreen()
+              : const LandingPage(),
     );
   }
 }
