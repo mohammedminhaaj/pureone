@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pureone/screens/cart_screen.dart';
-import 'package:pureone/screens/favorite_screen.dart';
 import 'package:pureone/screens/home_screen.dart';
 import 'package:pureone/screens/profile_screen.dart';
 import 'package:pureone/widgets/bottom_nav_bar/bottom_nav_bar.dart';
@@ -15,7 +14,6 @@ class LandingPage extends StatefulWidget {
 class _LandingPageState extends State<LandingPage> {
   final Map<String, Widget> currentScreenMap = {
     "Home": const HomeScreen(),
-    "Favorite": const FavoriteScreen(),
     "Cart": const CartScreen(),
     "Profile": const ProfileScreen(),
   };
@@ -32,6 +30,7 @@ class _LandingPageState extends State<LandingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        forceMaterialTransparency: true,
         toolbarHeight: 65,
         leadingWidth: double.infinity,
         leading: Container(
@@ -56,15 +55,17 @@ class _LandingPageState extends State<LandingPage> {
                 ],
               )),
         ),
-        actions: [
-          IconButton(
-              onPressed: () {},
-              icon: Icon(
-                Icons.search_rounded,
-                size: 36,
-                color: Theme.of(context).colorScheme.primary,
-              ))
-        ],
+        actions: currentScreen != "Profile"
+            ? [
+                IconButton(
+                    onPressed: () {},
+                    icon: Icon(
+                      Icons.search_rounded,
+                      size: 36,
+                      color: Theme.of(context).colorScheme.primary,
+                    ))
+              ]
+            : null,
       ),
       body: currentScreenMap[currentScreen],
       bottomNavigationBar: CustomeBottomNavigationBar(
