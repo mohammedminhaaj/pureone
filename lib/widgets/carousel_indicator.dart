@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:pureone/data/carousel.dart';
 import 'package:pureone/utils/indicators.dart';
 
 class CarouselIndicator extends StatelessWidget {
-  const CarouselIndicator(this.carouselIndex, {super.key});
+  const CarouselIndicator(this.carouselIndex, this.carouselLength, {super.key});
 
   final int carouselIndex;
+  final int carouselLength;
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class CarouselIndicator extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: IndicatorList(
-                length: carouselImages.length,
+                length: carouselLength,
                 objectIndex: carouselIndex,
                 indicatorColor: Theme.of(context).colorScheme.primary,
                 isHorizontal: true)

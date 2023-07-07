@@ -5,6 +5,7 @@ import 'package:pureone/screens/landing_page.dart';
 import 'package:pureone/screens/login.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pureone/screens/onboarding_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,21 +13,21 @@ void main() {
       .then((fn) {
     Hive.initFlutter().then((fn) {
       Hive.openBox("store").then((fn) {
-        runApp(const MyApp());
+        runApp(const ProviderScope(child: App()));
       });
     });
   });
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class App extends StatelessWidget {
+  const App({super.key});
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     final box = Hive.box("store");
     final bool onboardingCompleted =
         box.get("onboardingCompleted", defaultValue: false);
-    final String userLoggedIn = box.get("token", defaultValue: "");
+    final String userLoggedIn = box.get("authToken", defaultValue: "");
 
     return MaterialApp(
       title: 'Flutter Demo',

@@ -43,10 +43,10 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
         _errorDict = {};
         isLoading = true;
       });
-      final url = Uri.http(settings["baseUrl"]!, "/api/auth/login/otp/verify/");
+      final url = Uri.http(baseUrl, "/api/auth/login/otp/verify/");
       http
           .post(url,
-              headers: settings["requestHeader"],
+              headers: requestHeader,
               body: json.encode({
                 "mobile_number": widget.mobile,
                 "otp": _otp.values.join(),
@@ -65,7 +65,7 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
             _errorDict = data["errors"];
           });
         } else {
-          box.put("token", data["auth_token"]);
+          box.put("authToken", data["auth_token"]);
           Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (ctx) => const LandingPage()));
         }

@@ -4,3 +4,8 @@ Map<String, dynamic> settings = {
     "Content-Type": "application/json",
   },
 };
+
+const baseUrl = "192.168.0.187:8000";
+const requestHeader = {
+  "Content-Type": "application/json",
+};

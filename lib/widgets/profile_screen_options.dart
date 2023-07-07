@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pureone/providers/initial_state_provider.dart';
 import 'package:pureone/screens/login.dart';
 import 'package:pureone/settings.dart';
 import 'package:pureone/widgets/profile_option.dart';
 import 'package:pureone/widgets/profile_option_container.dart';
 import 'package:http/http.dart' as http;
 
-class ProfileOptions extends StatelessWidget {
+class ProfileOptions extends ConsumerWidget {
   const ProfileOptions({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final box = Hive.box("store");
-    final authToken = box.get("token");
+    final authToken = box.get("authToken", defaultValue: "");
 
     void onClickLogout() {
       showDialog(
@@ -33,14 +35,16 @@ class ProfileOptions extends StatelessWidget {
                           label: const Text("No")),
                       ElevatedButton.icon(
                           onPressed: () {
-                            box.delete("token");
+                            ref
+                                .read(initialStateProvider.notifier)
+                                .updateAppLoaded(false);
+                            box.delete("authToken");
                             Navigator.of(context, rootNavigator: true).pop();
-                            final url = Uri.http(
-                                settings["baseUrl"]!, "/api/auth/logout/");
+                            final url = Uri.http(baseUrl, "/api/auth/logout/");
                             http.post(
                               url,
                               headers: {
-                                ...settings["requestHeader"],
+                                ...requestHeader,
                                 "Authorization": "Token $authToken"
                               },
                             );

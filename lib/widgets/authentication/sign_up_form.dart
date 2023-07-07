@@ -36,10 +36,10 @@ class _SignUpFormState extends State<SignUpForm> {
         _errorDict = {};
         isLoading = true;
       });
-      final url = Uri.http(settings["baseUrl"]!, "/api/auth/sign-up/");
+      final url = Uri.http(baseUrl, "/api/auth/sign-up/");
       http
           .post(url,
-              headers: settings["requestHeader"],
+              headers: requestHeader,
               body: json.encode({
                 "mobile_number": _mobile,
                 "email": _email,
@@ -60,7 +60,7 @@ class _SignUpFormState extends State<SignUpForm> {
             _errorDict = data["errors"];
           });
         } else {
-          box.put("token", data["auth_token"]);
+          box.put("authToken", data["auth_token"]);
           Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (ctx) => const LandingPage()));
         }

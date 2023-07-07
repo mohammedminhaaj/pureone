@@ -40,10 +40,10 @@ class _LoginFormState extends State<LoginForm> {
         _errorDict = {};
         isLoading = true;
       });
-      final url = Uri.http(settings["baseUrl"]!, "/api/auth/login/credential/");
+      final url = Uri.http(baseUrl, "/api/auth/login/credential/");
       http
           .post(url,
-              headers: settings["requestHeader"],
+              headers: requestHeader,
               body: json.encode({
                 "email_number": _emailNumber,
                 "password": _password,
@@ -62,7 +62,7 @@ class _LoginFormState extends State<LoginForm> {
             _errorDict = data["errors"];
           });
         } else {
-          box.put("token", data["auth_token"]);
+          box.put("authToken", data["auth_token"]);
           Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (ctx) => const LandingPage()));
         }

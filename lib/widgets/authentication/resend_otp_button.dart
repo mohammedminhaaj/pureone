@@ -33,10 +33,10 @@ class _ResendOtpButtonState extends State<ResendOtpButton> {
       _enableButton = false;
       isLoading = true;
     });
-    final url = Uri.http(settings["baseUrl"]!, "/api/auth/login/otp/");
+    final url = Uri.http(baseUrl, "/api/auth/login/otp/");
     http
         .post(url,
-            headers: settings["requestHeader"],
+            headers: requestHeader,
             body: json.encode({
               "mobile_number": widget.mobile,
             }))

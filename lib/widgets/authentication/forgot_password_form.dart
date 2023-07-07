@@ -31,10 +31,10 @@ class _ForgotPasswordFormState extends State<ForgotPasswordForm> {
         _errorDict = {};
         isLoading = true;
       });
-      final url = Uri.http(settings["baseUrl"]!, "/api/auth/forgot-password/");
+      final url = Uri.http(baseUrl, "/api/auth/forgot-password/");
       http
           .post(url,
-              headers: settings["requestHeader"],
+              headers: requestHeader,
               body: json.encode({
                 "mobile_number": _mobile,
                 "email": _email,

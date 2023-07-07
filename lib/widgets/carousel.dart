@@ -1,24 +1,29 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:pureone/data/carousel.dart';
+import 'package:pureone/providers/initial_state_provider.dart';
+import 'package:pureone/settings.dart';
 import 'package:pureone/widgets/carousel_indicator.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
-class Carousel extends StatefulWidget {
+class Carousel extends ConsumerStatefulWidget {
   const Carousel({super.key});
 
   @override
-  State<Carousel> createState() => _CarouselState();
+  ConsumerState<Carousel> createState() => _CarouselState();
 }
 
-class _CarouselState extends State<Carousel> {
+class _CarouselState extends ConsumerState<Carousel> {
   int carouselIndex = 0;
   final PageController pageController =
       PageController(initialPage: 0, viewportFraction: 0.999);
 
   Timer getTimer() {
+    final List<String> carouselImageList =
+        ref.read(initialStateProvider.select((value) => value.carouselImages));
     return Timer.periodic(const Duration(seconds: 3), (timer) {
-      if (carouselIndex == carouselImages.length) {
+      if (carouselIndex == carouselImageList.length) {
         carouselIndex = 0;
       }
       pageController.animateToPage(carouselIndex,
@@ -44,6 +49,8 @@ class _CarouselState extends State<Carousel> {
 
   @override
   Widget build(BuildContext context) {
+    final List<String> carouselImageList =
+        ref.read(initialStateProvider.select((value) => value.carouselImages));
     return Column(
       children: [
         SizedBox(
@@ -52,9 +59,9 @@ class _CarouselState extends State<Carousel> {
             allowImplicitScrolling: true,
             controller: pageController,
             physics: const BouncingScrollPhysics(),
-            itemCount: carouselImages.length,
+            itemCount: carouselImageList.length,
             itemBuilder: (context, index) {
-              return _buildPageItem(index);
+              return _buildPageItem(index, carouselImageList[index]);
             },
             onPageChanged: (index) {
               setState(() {
@@ -63,12 +70,13 @@ class _CarouselState extends State<Carousel> {
             },
           ),
         ),
-        CarouselIndicator(carouselIndex)
+        CarouselIndicator(carouselIndex, carouselImageList.length)
       ],
     );
   }
 
-  Widget _buildPageItem(int index) {
+  Widget _buildPageItem(int index, String carouselImageUrl) {
+    final imageUrl = Uri.http(baseUrl, carouselImageUrl).toString();
     return InkWell(
       borderRadius: BorderRadius.circular(25),
       onTapDown: (_) {
@@ -85,7 +93,7 @@ class _CarouselState extends State<Carousel> {
             color: Colors.grey,
             image: DecorationImage(
                 fit: BoxFit.cover,
-                image: AssetImage("assets/images/${carouselImages[index]}"))),
+                image: CachedNetworkImageProvider(imageUrl))),
       ),
     );
   }
