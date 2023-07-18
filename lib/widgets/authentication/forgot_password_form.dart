@@ -48,10 +48,15 @@ class _ForgotPasswordFormState extends State<ForgotPasswordForm> {
           ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text(data["details"])));
         }
-        if (response.statusCode >= 400 && data.containsKey("errors")) {
-          setState(() {
-            _errorDict = data["errors"];
-          });
+        if (response.statusCode >= 400) {
+          if (data.containsKey("errors")) {
+            setState(() {
+              _errorDict = data["errors"];
+            });
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Something went wrong!")));
+          }
         } else {
           Navigator.of(context).pushReplacement(MaterialPageRoute(
               builder: (ctx) => PasswordSent(

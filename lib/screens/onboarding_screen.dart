@@ -19,6 +19,8 @@ class OnboardingScreen extends StatelessWidget {
                 height: double.infinity,
                 decoration: BoxDecoration(
                   image: DecorationImage(
+                    colorFilter: ColorFilter.mode(
+                        Colors.black.withOpacity(0.7), BlendMode.dstATop),
                     image: AssetImage(
                         "assets/images/${heroContentItem.backgroudImage}"),
                     fit: BoxFit.cover,

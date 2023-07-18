@@ -8,9 +8,12 @@ class InitialStateNotifier extends StateNotifier<InitialState> {
     state = state.copyWith(appLoaded: appLoaded);
   }
 
-  void updateInitialState(bool appLoaded, List<String> carouselImages) {
-    state =
-        state.copyWith(appLoaded: appLoaded, carouselImages: carouselImages);
+  void updateInitialState(
+      bool appLoaded, List<String> carouselImages, List<dynamic> allProducts) {
+    state = state.copyWith(
+        appLoaded: appLoaded,
+        carouselImages: carouselImages,
+        allProducts: allProducts);
   }
 }
 

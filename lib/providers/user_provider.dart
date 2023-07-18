@@ -4,15 +4,15 @@ import 'package:pureone/models/user.dart';
 class UserNotifier extends StateNotifier<User> {
   UserNotifier() : super(User());
 
-  void updateUsername(String username) {
-    state = state.copyWith(username: username);
+  void updateUsernameOrEmail({String? username, String? email}) {
+    state = state.copyWith(username: username, email: email);
   }
 
   void updateUserObject(Map<dynamic, dynamic> json) {
     state = state.copyWith(
-        email: json["email"] as String,
+        email: json["email"] ?? "",
         mobile: json["mobile_number"] as String,
-        username: json["username"] as String);
+        username: json["username"] ?? "");
   }
 }
 

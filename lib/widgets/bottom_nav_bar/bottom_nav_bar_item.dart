@@ -7,12 +7,16 @@ class CustomBottomNavigationBarItem extends StatelessWidget {
       required this.icon,
       required this.label,
       required this.isSelected,
-      required this.onTap});
+      required this.onTap,
+      this.useStack = false,
+      this.layer});
 
   final IconData icon;
   final String label;
   final bool isSelected;
   final void Function() onTap;
+  final bool useStack;
+  final Widget? layer;
 
   @override
   Widget build(BuildContext context) {
@@ -29,14 +33,35 @@ class CustomBottomNavigationBarItem extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 36,
-              color: Theme.of(context).colorScheme.primary,
-            )
-                .animate(target: isSelected ? 1 : 0)
-                .scaleXY(end: 0.8)
-                .tint(color: Colors.white),
+            if (useStack)
+              Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.bottomRight,
+                children: [
+                  Icon(
+                    icon,
+                    size: 36,
+                    color: Theme.of(context).colorScheme.primary,
+                  )
+                      .animate(target: isSelected ? 1 : 0)
+                      .scaleXY(end: 0.8)
+                      .tint(color: Colors.white),
+                  if (layer != null)
+                    layer!.animate(target: isSelected ? 1 : 0).scaleXY(end: 0.8)
+                ],
+              ).animate(target: isSelected ? 1 : 0)
+            else
+              Icon(
+                icon,
+                size: 36,
+                color: Theme.of(context).colorScheme.primary,
+              )
+                  .animate(target: isSelected ? 1 : 0)
+                  .scaleXY(end: 0.8)
+                  .tint(color: Colors.white),
+            const SizedBox(
+              width: 5,
+            ),
             if (isSelected)
               Text(
                 label,

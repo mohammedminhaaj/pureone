@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pureone/providers/cart_provider.dart';
 import 'package:pureone/providers/initial_state_provider.dart';
 import 'package:pureone/screens/login.dart';
 import 'package:pureone/settings.dart';
@@ -39,6 +40,7 @@ class ProfileOptions extends ConsumerWidget {
                                 .read(initialStateProvider.notifier)
                                 .updateAppLoaded(false);
                             box.delete("authToken");
+                            ref.read(cartProvider.notifier).clearCart();
                             Navigator.of(context, rootNavigator: true).pop();
                             final url = Uri.http(baseUrl, "/api/auth/logout/");
                             http.post(
@@ -73,6 +75,11 @@ class ProfileOptions extends ConsumerWidget {
             icon: Icons.reviews_rounded,
             onTap: () {},
           ),
+          ProfileOption(
+            label: "Edit Profile",
+            icon: Icons.edit_square,
+            onTap: () {},
+          ),
         ]),
         ProfileOptionContainer(header: "More", children: [
           ProfileOption(
@@ -81,9 +88,20 @@ class ProfileOptions extends ConsumerWidget {
             onTap: () {},
           ),
           ProfileOption(
+            label: "Support",
+            icon: Icons.support_agent_rounded,
+            onTap: () {},
+          ),
+          ProfileOption(
+            label: "About Us",
+            icon: Icons.stars_rounded,
+            onTap: () {},
+          ),
+          ProfileOption(
             label: "Logout",
             icon: Icons.logout_rounded,
             onTap: onClickLogout,
+            iconColor: Colors.red[400],
           ),
         ]),
       ],

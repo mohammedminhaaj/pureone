@@ -57,10 +57,15 @@ class _LoginFormState extends State<LoginForm> {
           ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text(data["details"])));
         }
-        if (response.statusCode >= 400 && data.containsKey("errors")) {
-          setState(() {
-            _errorDict = data["errors"];
-          });
+        if (response.statusCode >= 400) {
+          if (data.containsKey("errors")) {
+            setState(() {
+              _errorDict = data["errors"];
+            });
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Something went wrong!")));
+          }
         } else {
           box.put("authToken", data["auth_token"]);
           Navigator.of(context).pushReplacement(
@@ -132,13 +137,13 @@ class _LoginFormState extends State<LoginForm> {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (ctx) => const SignUpScreen()));
                       },
-                      child: const Text("Don't have an account?")),
+                      child: const Text("Create Account")),
                   TextButton(
                       onPressed: () {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (ctx) => const ForgotPasswordScreen()));
                       },
-                      child: const Text("Forgot password?")),
+                      child: const Text("Forgot password")),
                 ],
               ),
               const SizedBox(

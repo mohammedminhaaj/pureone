@@ -1,0 +1,356 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pureone/models/cart.dart';
+import 'package:pureone/models/product.dart';
+import 'package:pureone/providers/cart_provider.dart';
+import 'package:pureone/screens/landing_page.dart';
+import 'package:pureone/settings.dart';
+import 'package:pureone/widgets/authentication/quantity_chip.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+class ProductDetail extends ConsumerStatefulWidget {
+  const ProductDetail(
+      {super.key, required this.name, required this.productImage});
+
+  final String name;
+  final String productImage;
+
+  @override
+  ConsumerState<ProductDetail> createState() => _ProductDetailState();
+}
+
+class _ProductDetailState extends ConsumerState<ProductDetail> {
+  late Product product;
+  ProductQuantity? productQuantity;
+  final box = Hive.box("store");
+  bool isLoading = true;
+  bool processingCart = false;
+
+  void _addToCart() {
+    setState(() {
+      processingCart = true;
+    });
+    ref
+        .read(cartProvider.notifier)
+        .addToCart(
+            context: context,
+            product: product,
+            selectedQuantity: productQuantity!)
+        .then((response) {
+      if (response != null) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        if (response.statusCode >= 400) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(data["details"])));
+        } else {
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(data["details"]),
+            action: SnackBarAction(
+                label: "View",
+                onPressed: () {
+                  Navigator.of(context, rootNavigator: true).pop();
+                  Navigator.of(context, rootNavigator: true)
+                      .pushReplacement(MaterialPageRoute(
+                          builder: (ctx) => const LandingPage(
+                                redirectTo: "Cart",
+                              )));
+                }),
+          ));
+        }
+      }
+      setState(() {
+        processingCart = false;
+      });
+    }).onError((error, stackTrace) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Something went wrong!")));
+    });
+  }
+
+  @override
+  void initState() {
+    product = Product.empty();
+    super.initState();
+    final url = Uri.http(baseUrl, "/api/product/get-product/${widget.name}/");
+    final token = box.get("authToken");
+    http.get(url, headers: {
+      ...requestHeader,
+      "Authorization": "Token $token"
+    }).then((response) {
+      final Map<dynamic, dynamic> data = json.decode(response.body);
+      setState(() {
+        product = Product.fromJson(data);
+        isLoading = false;
+        if (product.availableQuantities.isNotEmpty) {
+          final List<Cart> cartList = ref.read(cartProvider);
+          try {
+            final Cart productInCart = cartList.singleWhere(
+                (element) => element.product!.name == product.name);
+            productQuantity = productInCart.selectedQuantity;
+          } on StateError {
+            productQuantity = product.availableQuantities[0];
+          }
+        }
+      });
+    }).onError((error, stackTrace) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Something went wrong!")));
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        forceMaterialTransparency: true,
+      ),
+      body: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          children: [
+            Hero(
+              tag: widget.name,
+              child: Container(
+                height: MediaQuery.of(context).size.height * .25,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    color: Colors.grey,
+                    image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image:
+                            CachedNetworkImageProvider(widget.productImage))),
+              ),
+            ),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Theme.of(context)
+                            .colorScheme
+                            .primaryContainer
+                            .withOpacity(0.3), // Start color
+                        Colors.white, // End color with opacity
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(25),
+                    ),
+                  ),
+                  child: isLoading
+                      ? const SizedBox(
+                          height: 128,
+                          width: double.infinity,
+                          child: Center(child: CircularProgressIndicator()),
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                TextButton.icon(
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.location_on_rounded,
+                                      color: Colors.grey,
+                                    ),
+                                    label: Text(
+                                      product.vendor,
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.grey,
+                                      ),
+                                    )),
+                                TextButton.icon(
+                                    onPressed: () {},
+                                    icon: Icon(
+                                      Icons.star_rounded,
+                                      color: Colors.amber[500],
+                                    ),
+                                    label: const Text(
+                                      "4.3",
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.grey,
+                                      ),
+                                    )),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    product.displayName,
+                                    style: const TextStyle(
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      productQuantity != null
+                                          ? "\u{20B9} ${productQuantity?.price.split(".")[0]}"
+                                          : "",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 30,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary),
+                                    ),
+                                    Text(
+                                      productQuantity != null
+                                          ? "\u{20B9} ${productQuantity?.originalPrice.split(".")[0]}"
+                                          : "",
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey,
+                                          fontSize: 15,
+                                          decoration:
+                                              TextDecoration.lineThrough),
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            Wrap(
+                              spacing: 10,
+                              runSpacing: 10,
+                              children: product.availableQuantities.isEmpty
+                                  ? [
+                                      Text(
+                                        "We are currently out of stock. Apologies for the inconvenience.",
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
+                                            fontSize: 20),
+                                      )
+                                    ]
+                                  : List.generate(
+                                      product.availableQuantities.length,
+                                      (index) => QuantityChip(
+                                        label: product
+                                            .availableQuantities[index]
+                                            .quantity,
+                                        isSelected: productQuantity!.quantity ==
+                                            product.availableQuantities[index]
+                                                .quantity,
+                                        onTap: () {
+                                          setState(() {
+                                            productQuantity = product
+                                                .availableQuantities[index];
+                                          });
+                                        },
+                                      ),
+                                    ),
+                            ),
+                            const SizedBox(height: 20),
+                            Text(
+                              product.description!,
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        )
+                          .animate()
+                          .fadeIn(duration: 700.ms)
+                          .moveY(duration: 700.ms, begin: 20, end: 0),
+                ),
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 10),
+                    width: 50,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: SizedBox(
+        height: 70,
+        child: TextButton.icon(
+            style: ButtonStyle(
+                shape: MaterialStateProperty.all<OutlinedBorder>(
+                  const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                  ),
+                ),
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                backgroundColor: MaterialStateProperty.all<Color>(isLoading ||
+                        processingCart ||
+                        product.availableQuantities.isEmpty ||
+                        product.deletedAt != null
+                    ? Colors.grey
+                    : Theme.of(context).colorScheme.primary)),
+            onPressed: isLoading ||
+                    processingCart ||
+                    product.availableQuantities.isEmpty ||
+                    product.deletedAt != null
+                ? null
+                : _addToCart,
+            icon: processingCart
+                ? const SizedBox(
+                    height: 16,
+                    width: 16,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
+                  )
+                : Icon(
+                    product.name != "" &&
+                            (product.availableQuantities.isEmpty ||
+                                product.deletedAt != null)
+                        ? Icons.remove_shopping_cart_rounded
+                        : Icons.add_shopping_cart_rounded,
+                    size: 30,
+                  ),
+            label: Text(
+              product.name != "" &&
+                      (product.availableQuantities.isEmpty ||
+                          product.deletedAt != null)
+                  ? "Out of Stock"
+                  : "Add to Cart",
+              style: const TextStyle(
+                fontSize: 18, // Adjust the text size
+              ),
+            )),
+      ),
+    );
+  }
+}

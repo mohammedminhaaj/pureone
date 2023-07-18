@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 
 class ProfileOption extends StatelessWidget {
-  const ProfileOption({
-    super.key,
-    required this.label,
-    required this.icon,
-    required this.onTap,
-  });
+  const ProfileOption(
+      {super.key,
+      required this.label,
+      required this.icon,
+      required this.onTap,
+      this.iconColor});
 
   final String label;
   final IconData icon;
   final void Function() onTap;
+  final Color? iconColor;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +40,7 @@ class ProfileOption extends StatelessWidget {
                   child: Icon(
                     icon,
                     size: 25,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: iconColor ?? Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 const SizedBox(
