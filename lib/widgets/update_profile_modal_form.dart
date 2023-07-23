@@ -36,7 +36,7 @@ class _UpdateProfileModalFormState
         _errorDict = {};
         isLoading = true;
       });
-      final url = Uri.http(baseUrl, "/api/auth/update-profile/");
+      final url = Uri.http(baseUrl, "/api/user/auth/update-profile/");
       Map<String, String> jsonData = {"username": _username};
       String authToken = box.get("authToken", defaultValue: "");
       if (_email != "") {

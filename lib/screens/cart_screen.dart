@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pureone/models/cart.dart';
 import 'package:pureone/providers/cart_provider.dart';
+import 'package:pureone/widgets/bill_summary.dart';
 import 'package:pureone/widgets/cart_item.dart';
 import 'package:pureone/widgets/cart_section.dart';
 import 'package:pureone/widgets/checkout_overlay.dart';
@@ -32,12 +33,15 @@ class CartScreen extends ConsumerWidget {
             clipBehavior: Clip.none,
             children: [
               SingleChildScrollView(
-                  padding: const EdgeInsets.only(bottom: 150),
+                  padding: const EdgeInsets.only(bottom: 80),
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: Container(
                     padding: const EdgeInsets.all(10),
                     child: Column(
                       children: [
+                        const CartSection(
+                            header: "Delivery",
+                            child: Text("Delivery details go here")),
                         CartSection(
                             header: "My Items",
                             child: Column(
@@ -50,7 +54,16 @@ class CartScreen extends ConsumerWidget {
                                   includeDivider: includeDivider,
                                 );
                               }),
-                            ))
+                            )),
+                        const CartSection(
+                            header: "Offers",
+                            child: Text("Offer details go here")),
+                        const CartSection(
+                            header: "Bill Summary", child: BillSummary()),
+                        const CartSection(
+                            header: "Cancellation Policy",
+                            child: Text(
+                                "Orders once placed cannot be cancelled and are non-refundable")),
                       ],
                     ),
                   )),

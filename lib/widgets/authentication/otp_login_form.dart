@@ -29,7 +29,7 @@ class _OtpLoginFormState extends State<OtpLoginForm> {
         _errorDict = {};
         isLoading = true;
       });
-      final url = Uri.http(baseUrl, "/api/auth/login/otp/");
+      final url = Uri.http(baseUrl, "/api/user/auth/login/otp/");
       http
           .post(url,
               headers: requestHeader,
@@ -50,9 +50,6 @@ class _OtpLoginFormState extends State<OtpLoginForm> {
             setState(() {
               _errorDict = data["errors"];
             });
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Something went wrong!")));
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(

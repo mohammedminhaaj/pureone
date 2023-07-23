@@ -43,7 +43,7 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
         _errorDict = {};
         isLoading = true;
       });
-      final url = Uri.http(baseUrl, "/api/auth/login/otp/verify/");
+      final url = Uri.http(baseUrl, "/api/user/auth/login/otp/verify/");
       http
           .post(url,
               headers: requestHeader,
@@ -65,9 +65,6 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
             setState(() {
               _errorDict = data["errors"];
             });
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Something went wrong!")));
           }
         } else {
           box.put("authToken", data["auth_token"]);

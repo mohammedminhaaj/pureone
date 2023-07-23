@@ -48,8 +48,12 @@ class App extends StatelessWidget {
           // This works for code too, not just values: Most code changes can be
           // tested with just a hot reload.
           colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color.fromARGB(255, 0, 90, 125)), //#005a7d
+              seedColor: const Color.fromARGB(255, 0, 90, 125)),
+          bottomSheetTheme: const BottomSheetThemeData(
+              backgroundColor: Colors.white,
+              surfaceTintColor: Colors.white), //#005a7d
           useMaterial3: true,
+          scaffoldBackgroundColor: Colors.white,
           textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme)),
       home: !onboardingCompleted
           ? const OnboardingScreen()

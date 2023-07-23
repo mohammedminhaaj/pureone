@@ -8,7 +8,7 @@ import 'package:pureone/models/product.dart';
 import 'package:pureone/providers/cart_provider.dart';
 import 'package:pureone/screens/landing_page.dart';
 import 'package:pureone/settings.dart';
-import 'package:pureone/widgets/authentication/quantity_chip.dart';
+import 'package:pureone/widgets/quantity_chip.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -108,7 +108,6 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         forceMaterialTransparency: true,
       ),

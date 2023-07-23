@@ -8,6 +8,15 @@ class UserNotifier extends StateNotifier<User> {
     state = state.copyWith(username: username, email: email);
   }
 
+  void addUserCurrentLocation({double? lt, double? ln, String? shortAddress}) {
+    state = state.copyWith(
+        currentLocation: state.currentLocation.copyWith(
+      lt: lt,
+      ln: ln,
+      shortAddress: shortAddress,
+    ));
+  }
+
   void updateUserObject(Map<dynamic, dynamic> json) {
     state = state.copyWith(
         email: json["email"] ?? "",

@@ -40,7 +40,7 @@ class _LoginFormState extends State<LoginForm> {
         _errorDict = {};
         isLoading = true;
       });
-      final url = Uri.http(baseUrl, "/api/auth/login/credential/");
+      final url = Uri.http(baseUrl, "/api/user/auth/login/credential/");
       http
           .post(url,
               headers: requestHeader,
@@ -62,9 +62,6 @@ class _LoginFormState extends State<LoginForm> {
             setState(() {
               _errorDict = data["errors"];
             });
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Something went wrong!")));
           }
         } else {
           box.put("authToken", data["auth_token"]);

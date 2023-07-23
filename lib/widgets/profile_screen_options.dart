@@ -42,7 +42,8 @@ class ProfileOptions extends ConsumerWidget {
                             box.delete("authToken");
                             ref.read(cartProvider.notifier).clearCart();
                             Navigator.of(context, rootNavigator: true).pop();
-                            final url = Uri.http(baseUrl, "/api/auth/logout/");
+                            final url =
+                                Uri.http(baseUrl, "/api/user/auth/logout/");
                             http.post(
                               url,
                               headers: {

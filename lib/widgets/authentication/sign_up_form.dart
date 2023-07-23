@@ -36,7 +36,7 @@ class _SignUpFormState extends State<SignUpForm> {
         _errorDict = {};
         isLoading = true;
       });
-      final url = Uri.http(baseUrl, "/api/auth/sign-up/");
+      final url = Uri.http(baseUrl, "/api/user/auth/sign-up/");
       http
           .post(url,
               headers: requestHeader,
@@ -60,9 +60,6 @@ class _SignUpFormState extends State<SignUpForm> {
             setState(() {
               _errorDict = data["errors"];
             });
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Something went wrong!")));
           }
         } else {
           box.put("authToken", data["auth_token"]);

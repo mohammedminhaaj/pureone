@@ -10,37 +10,38 @@ class PasswordSent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         forceMaterialTransparency: true,
       ),
-      body: Container(
-        constraints: const BoxConstraints(maxWidth: 400),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                "assets/images/password-sent.png",
-                colorBlendMode: BlendMode.multiply,
-              ),
-              Text(
-                "A temporary password has been sent to $email. Please use the password for logging in to your account.",
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              const AuthenticationScreenFooter(),
-            ],
-          ),
-        )
-            .animate()
-            .fadeIn(duration: 700.ms)
-            .moveY(duration: 700.ms, begin: -20, end: 0),
+      body: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 500),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  "assets/images/password-sent.png",
+                  colorBlendMode: BlendMode.multiply,
+                ),
+                Text(
+                  "A temporary password has been sent to $email. Please use the password for logging in to your account.",
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.w300),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                const AuthenticationScreenFooter(),
+              ],
+            ),
+          )
+              .animate()
+              .fadeIn(duration: 700.ms)
+              .moveY(duration: 700.ms, begin: -20, end: 0),
+        ),
       ),
     );
   }

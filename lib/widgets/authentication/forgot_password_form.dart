@@ -31,7 +31,7 @@ class _ForgotPasswordFormState extends State<ForgotPasswordForm> {
         _errorDict = {};
         isLoading = true;
       });
-      final url = Uri.http(baseUrl, "/api/auth/forgot-password/");
+      final url = Uri.http(baseUrl, "/api/user/auth/forgot-password/");
       http
           .post(url,
               headers: requestHeader,
@@ -53,9 +53,6 @@ class _ForgotPasswordFormState extends State<ForgotPasswordForm> {
             setState(() {
               _errorDict = data["errors"];
             });
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Something went wrong!")));
           }
         } else {
           Navigator.of(context).pushReplacement(MaterialPageRoute(

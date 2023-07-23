@@ -9,41 +9,42 @@ class OtpLoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         forceMaterialTransparency: true,
       ),
-      body: Container(
-        constraints: const BoxConstraints(maxWidth: 400),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                "assets/images/otp-login.png",
-                colorBlendMode: BlendMode.multiply,
-              ),
-              const Text(
-                "OTP Login",
-                style: TextStyle(fontSize: 35, fontWeight: FontWeight.w700),
-              ),
-              const Text(
-                "Please enter your mobile number to continue.",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
-                textAlign: TextAlign.center,
-              ),
-              const OtpLoginForm(),
-              const SizedBox(
-                height: 20,
-              ),
-              const AuthenticationScreenFooter(),
-            ],
-          ),
-        )
-            .animate()
-            .fadeIn(duration: 700.ms)
-            .moveY(duration: 700.ms, begin: -20, end: 0),
+      body: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 500),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  "assets/images/otp-login.png",
+                  colorBlendMode: BlendMode.multiply,
+                ),
+                const Text(
+                  "OTP Login",
+                  style: TextStyle(fontSize: 35, fontWeight: FontWeight.w700),
+                ),
+                const Text(
+                  "Please enter your mobile number to continue.",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
+                  textAlign: TextAlign.center,
+                ),
+                const OtpLoginForm(),
+                const SizedBox(
+                  height: 20,
+                ),
+                const AuthenticationScreenFooter(),
+              ],
+            ),
+          )
+              .animate()
+              .fadeIn(duration: 700.ms)
+              .moveY(duration: 700.ms, begin: -20, end: 0),
+        ),
       ),
     );
   }
