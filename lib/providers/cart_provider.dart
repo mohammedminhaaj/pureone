@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pureone/models/cart.dart';
 import 'package:pureone/models/product.dart';
+import 'package:pureone/models/store.dart';
 import 'package:pureone/settings.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -10,7 +11,7 @@ import 'dart:convert';
 class CartNotifier extends StateNotifier<List<Cart>> {
   CartNotifier() : super([]);
 
-  final box = Hive.box("store");
+  final Box<Store> box = Hive.box<Store>("store");
 
   void generateCartList(List<dynamic> json) {
     state = json
@@ -40,7 +41,8 @@ class CartNotifier extends StateNotifier<List<Cart>> {
     }
 
     late final Uri url;
-    final String authToken = box.get("authToken");
+    final Store store = box.get("storeObj", defaultValue: Store())!;
+    final String authToken = store.authToken;
     final Map<String, dynamic> requestBody = {
       "product_quantity_id": selectedQuantity.id,
     };
@@ -75,7 +77,8 @@ class CartNotifier extends StateNotifier<List<Cart>> {
     ];
 
     final url = Uri.http(baseUrl, "/api/product/delete-cart/");
-    final String authToken = box.get("authToken");
+    final Store store = box.get("storeObj", defaultValue: Store())!;
+    final String authToken = store.authToken;
     http.delete(url,
         headers: {...requestHeader, "Authorization": "Token $authToken"},
         body: json.encode({

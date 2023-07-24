@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pureone/models/store.dart';
 import 'package:pureone/screens/landing_page.dart';
 import 'package:pureone/screens/login.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -12,7 +13,8 @@ void main() {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((fn) {
     Hive.initFlutter().then((fn) {
-      Hive.openBox("store").then((fn) {
+      Hive.registerAdapter(StoreAdapter());
+      Hive.openBox<Store>("store").then((fn) {
         runApp(const ProviderScope(child: App()));
       });
     });
@@ -24,13 +26,13 @@ class App extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    final box = Hive.box("store");
-    final bool onboardingCompleted =
-        box.get("onboardingCompleted", defaultValue: false);
-    final String userLoggedIn = box.get("authToken", defaultValue: "");
+    final Box<Store> box = Hive.box<Store>("store");
+    final Store store = box.get("storeObj", defaultValue: Store())!;
+    final bool onboardingCompleted = store.onboardingCompleted;
+    final String userLoggedIn = store.authToken;
 
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'PureOne',
       theme: ThemeData(
           // This is the theme of your application.
           //

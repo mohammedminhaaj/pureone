@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:pureone/providers/initial_state_provider.dart';
+import 'package:pureone/providers/home_screen_builder_provider.dart';
 import 'package:pureone/settings.dart';
 import 'package:pureone/widgets/carousel_indicator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,9 +19,10 @@ class _CarouselState extends ConsumerState<Carousel> {
   final PageController pageController =
       PageController(initialPage: 0, viewportFraction: 0.999);
 
+  Timer? carouselTimer;
+  late final List<String> carouselImageList;
+
   Timer getTimer() {
-    final List<String> carouselImageList =
-        ref.read(initialStateProvider.select((value) => value.carouselImages));
     return Timer.periodic(const Duration(seconds: 3), (timer) {
       if (carouselIndex == carouselImageList.length) {
         carouselIndex = 0;
@@ -32,10 +33,10 @@ class _CarouselState extends ConsumerState<Carousel> {
     });
   }
 
-  Timer? carouselTimer;
-
   @override
   void initState() {
+    carouselImageList = ref.read(
+        homeScreenBuilderProvider.select((value) => value.carouselImages));
     carouselTimer = getTimer();
     super.initState();
   }
@@ -49,8 +50,6 @@ class _CarouselState extends ConsumerState<Carousel> {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> carouselImageList =
-        ref.read(initialStateProvider.select((value) => value.carouselImages));
     return Column(
       children: [
         SizedBox(

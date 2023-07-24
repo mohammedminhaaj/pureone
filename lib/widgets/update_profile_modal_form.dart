@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:pureone/providers/user_provider.dart';
+import 'package:pureone/models/store.dart';
 import 'package:pureone/settings.dart';
 import 'package:pureone/utils/input_decoration.dart';
 import 'package:pureone/widgets/authentication/form_error.dart';
@@ -25,7 +25,7 @@ class _UpdateProfileModalFormState
 
   final _formKey = GlobalKey<FormState>();
 
-  final box = Hive.box("store");
+  final Box<Store> box = Hive.box<Store>("store");
 
   void _submitForm() {
     FocusScope.of(context).unfocus();
@@ -38,7 +38,8 @@ class _UpdateProfileModalFormState
       });
       final url = Uri.http(baseUrl, "/api/user/auth/update-profile/");
       Map<String, String> jsonData = {"username": _username};
-      String authToken = box.get("authToken", defaultValue: "");
+      final Store store = box.get("storeObj", defaultValue: Store())!;
+      final String authToken = store.authToken;
       if (_email != "") {
         jsonData.addAll({"email": _email});
       }
@@ -66,8 +67,8 @@ class _UpdateProfileModalFormState
             }
           });
         } else {
-          ref.read(userProvider.notifier).updateUsernameOrEmail(
-              username: _username, email: _email != "" ? _email : null);
+          store.username = _username;
+          box.put("storeObj", store);
           Navigator.of(context, rootNavigator: true).pop();
         }
       }).onError((error, stackTrace) {
@@ -83,10 +84,8 @@ class _UpdateProfileModalFormState
 
   @override
   Widget build(BuildContext context) {
-    final bool showEmailField =
-        ref.read(userProvider.select((value) => value.emailAddress)) == ""
-            ? true
-            : false;
+    final Store store = box.get("storeObj", defaultValue: Store())!;
+    final bool showEmailField = store.userEmail == "" ? true : false;
     return Form(
       key: _formKey,
       child: Column(children: [

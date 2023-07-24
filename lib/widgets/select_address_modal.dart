@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pureone/models/user.dart';
-import 'package:pureone/providers/user_provider.dart';
+import 'package:pureone/providers/user_location_provider.dart';
 import 'package:pureone/widgets/add_address.dart';
 import 'package:pureone/widgets/use_current_location.dart';
 
@@ -64,12 +64,13 @@ class SelectAddressModal extends StatelessWidget {
                         ),
                         Consumer(
                           builder: (context, ref, child) {
-                            final UserLocation userAddress = ref.read(
-                                userProvider
+                            final UserAddress? currentLocation = ref.read(
+                                userLocationProvider
                                     .select((value) => value.currentLocation));
                             return Text(
-                              userAddress.shortAddress != null
-                                  ? userAddress.shortAddress!
+                              currentLocation != null &&
+                                      currentLocation.shortAddress != null
+                                  ? currentLocation.shortAddress!
                                   : "Location was not detected",
                               style: const TextStyle(fontSize: 12),
                             );

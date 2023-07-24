@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pureone/models/store.dart';
 import 'package:pureone/screens/login.dart';
 import 'package:pureone/utils/indicators.dart';
 
@@ -17,8 +18,10 @@ class HeroContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void onContinue() {
-      final box = Hive.box("store");
-      box.put("onboardingCompleted", true);
+      final Box<Store> box = Hive.box<Store>("store");
+      final Store store = box.get("storeObj", defaultValue: Store())!;
+      store.onboardingCompleted = true;
+      box.put("storeObj", store);
       Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (ctx) => const LoginScreen()));
     }

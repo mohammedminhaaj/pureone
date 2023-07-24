@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pureone/models/store.dart';
 import 'package:pureone/settings.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -32,7 +33,7 @@ class _AddAddressFormState extends State<AddAddressForm> {
   bool isLoading = false;
 
   final _formKey = GlobalKey<FormState>();
-  final box = Hive.box("store");
+  final Box<Store> box = Hive.box<Store>("store");
 
   void _submitForm() {
     FocusScope.of(context).unfocus();
@@ -44,7 +45,8 @@ class _AddAddressFormState extends State<AddAddressForm> {
         isLoading = true;
       });
       final url = Uri.http(baseUrl, "/api/user/add-user-location/");
-      final authToken = box.get("authToken");
+      final Store store = box.get("storeObj", defaultValue: Store())!;
+      final String authToken = store.authToken;
       http
           .post(url,
               headers: {...requestHeader, "Authorization": "Token $authToken"},

@@ -1,19 +1,36 @@
-class UserLocation {
-  const UserLocation({
-    this.latitude,
-    this.longitude,
-    this.shortAddress,
-  });
+class UserAddress {
+  const UserAddress(
+      {this.latitude,
+      this.longitude,
+      this.shortAddress,
+      this.longAddress,
+      this.building,
+      this.locality,
+      this.landmark});
   final double? latitude;
   final double? longitude;
   final String? shortAddress;
+  final String? longAddress;
+  final String? building;
+  final String? locality;
+  final String? landmark;
 
-  UserLocation copyWith({double? lt, double? ln, String? shortAddress}) {
-    return UserLocation(
-      latitude: lt ?? latitude,
-      longitude: ln ?? longitude,
-      shortAddress: shortAddress ?? this.shortAddress,
-    );
+  UserAddress copyWith(
+      {double? lt,
+      double? ln,
+      String? shortAddress,
+      String? longAddress,
+      String? building,
+      String? locality,
+      String? landmark}) {
+    return UserAddress(
+        latitude: lt ?? latitude,
+        longitude: ln ?? longitude,
+        shortAddress: shortAddress ?? this.shortAddress,
+        longAddress: longAddress ?? this.longAddress,
+        building: building ?? this.building,
+        locality: locality ?? this.locality,
+        landmark: landmark ?? this.landmark);
   }
 
   List<String> get _addressComponents {
@@ -39,27 +56,17 @@ class UserLocation {
   }
 }
 
-class User {
-  User(
-      {this.username = "",
-      this.mobileNumber = "",
-      this.emailAddress = "",
-      this.currentLocation = const UserLocation()});
+class UserLocation {
+  const UserLocation({this.currentLocation, this.selectedLocation});
 
-  final String username;
-  final String mobileNumber;
-  final String emailAddress;
-  UserLocation currentLocation;
+  final UserAddress? currentLocation;
+  final UserAddress? selectedLocation;
 
-  User copyWith(
-      {String? email,
-      String? mobile,
-      String? username,
-      UserLocation? currentLocation}) {
-    return User(
-        emailAddress: email ?? emailAddress,
-        mobileNumber: mobile ?? mobileNumber,
-        username: username ?? this.username,
-        currentLocation: currentLocation ?? this.currentLocation);
+  UserLocation copyWith(
+      {UserAddress? currentLocation, UserAddress? selectedLocation}) {
+    return UserLocation(
+      currentLocation: currentLocation ?? this.currentLocation,
+      selectedLocation: selectedLocation ?? this.selectedLocation,
+    );
   }
 }

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pureone/providers/user_provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pureone/models/store.dart';
 import 'package:pureone/widgets/profile_screen_options.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-class ProfileScreen extends ConsumerWidget {
+class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.read(userProvider);
+  Widget build(BuildContext context) {
+    final Box<Store> box = Hive.box<Store>("store");
+    final Store store = box.get("storeObj", defaultValue: Store())!;
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       physics: const AlwaysScrollableScrollPhysics(),
@@ -44,7 +45,7 @@ class ProfileScreen extends ConsumerWidget {
                   children: [
                     const Text("Hello,", style: TextStyle(fontSize: 40)),
                     Text(
-                      user.username,
+                      store.username,
                       style: TextStyle(
                           fontSize: 30,
                           color: Theme.of(context).colorScheme.primary),

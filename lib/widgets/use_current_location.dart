@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:location/location.dart';
 import 'package:pureone/models/user.dart';
-import 'package:pureone/providers/initial_state_provider.dart';
-import 'package:pureone/providers/user_provider.dart';
+import 'package:pureone/providers/home_screen_builder_provider.dart';
+import 'package:pureone/providers/user_location_provider.dart';
 import 'package:pureone/screens/landing_page.dart';
 import 'package:pureone/utils/location_services.dart';
 import 'package:flutter/material.dart';
@@ -31,10 +31,14 @@ class _UseCurrentLocationState extends ConsumerState<UseCurrentLocation> {
           _lt = value["location"].latitude;
           _ln = value["location"].longitude;
         } else {
-          final UserLocation currentLocation =
-              ref.read(userProvider.select((value) => value.currentLocation));
-          _lt = currentLocation.latitude ?? 12.9716;
-          _ln = currentLocation.longitude ?? 77.5946;
+          final UserAddress? currentLocation = ref.read(
+              userLocationProvider.select((value) => value.currentLocation));
+          _lt = currentLocation != null && currentLocation.latitude != null
+              ? currentLocation.latitude
+              : 12.9716;
+          _ln = currentLocation != null && currentLocation.longitude != null
+              ? currentLocation.longitude
+              : 77.5946;
         }
         getAddress(_lt!, _ln!).then((value) {
           setState(() {
@@ -125,16 +129,18 @@ class _UseCurrentLocationState extends ConsumerState<UseCurrentLocation> {
                                     onPressed: _longAddress != null
                                         ? () {
                                             ref
-                                                .read(userProvider.notifier)
+                                                .read(userLocationProvider
+                                                    .notifier)
                                                 .addUserCurrentLocation(
                                                   lt: _lt,
                                                   ln: _ln,
                                                   shortAddress: _shortAddress,
+                                                  longAddress: _longAddress,
                                                 );
                                             ref
-                                                .read(initialStateProvider
+                                                .read(homeScreenBuilderProvider
                                                     .notifier)
-                                                .updateAppLoaded(false);
+                                                .setHomeScreenUpdated(false);
 
                                             Navigator.of(context,
                                                     rootNavigator: true)

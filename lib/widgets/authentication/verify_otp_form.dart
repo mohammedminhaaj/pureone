@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pureone/models/store.dart';
 import 'package:pureone/screens/landing_page.dart';
 import 'package:pureone/settings.dart';
 import 'package:pureone/widgets/authentication/form_error.dart';
@@ -30,7 +31,7 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
   Map<String, dynamic> _errorDict = {};
   bool isLoading = false;
 
-  final box = Hive.box("store");
+  final Box<Store> box = Hive.box<Store>("store");
 
   final _formKey = GlobalKey<FormState>();
 
@@ -67,7 +68,12 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
             });
           }
         } else {
-          box.put("authToken", data["auth_token"]);
+          final Store store = box.get("storeObj", defaultValue: Store())!;
+          store.authToken = data["auth_token"];
+          store.username = data["username"];
+          store.savedAddresses = data["saved_addresses"];
+          store.userEmail = data["email"] ?? "";
+          box.put("storeObj", store);
           Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (ctx) => const LandingPage()));
         }
@@ -98,6 +104,7 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
                     height: 54,
                     width: 50,
                     child: TextFormField(
+                      autofocus: true,
                       onSaved: (value) {
                         _otp[index] = value!;
                       },

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pureone/models/store.dart';
 import 'package:pureone/providers/cart_provider.dart';
-import 'package:pureone/providers/initial_state_provider.dart';
+import 'package:pureone/providers/home_screen_builder_provider.dart';
 import 'package:pureone/screens/login.dart';
 import 'package:pureone/settings.dart';
 import 'package:pureone/widgets/profile_option.dart';
@@ -14,8 +15,9 @@ class ProfileOptions extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final box = Hive.box("store");
-    final authToken = box.get("authToken", defaultValue: "");
+    final Box<Store> box = Hive.box<Store>("store");
+    final Store store = box.get("storeObj", defaultValue: Store())!;
+    final String authToken = store.authToken;
 
     void onClickLogout() {
       showDialog(
@@ -37,9 +39,10 @@ class ProfileOptions extends ConsumerWidget {
                       ElevatedButton.icon(
                           onPressed: () {
                             ref
-                                .read(initialStateProvider.notifier)
-                                .updateAppLoaded(false);
-                            box.delete("authToken");
+                                .read(homeScreenBuilderProvider.notifier)
+                                .setHomeScreenUpdated(false);
+                            store.authToken = "";
+                            box.put("storeObj", store);
                             ref.read(cartProvider.notifier).clearCart();
                             Navigator.of(context, rootNavigator: true).pop();
                             final url =
