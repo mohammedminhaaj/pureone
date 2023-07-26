@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pureone/models/store.dart';
+import 'package:pureone/providers/home_screen_builder_provider.dart';
+import 'package:pureone/providers/user_location_provider.dart';
+import 'package:pureone/screens/landing_page.dart';
 import 'package:pureone/settings.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -8,24 +12,32 @@ import 'dart:convert';
 import 'package:pureone/utils/input_decoration.dart';
 import 'package:pureone/widgets/authentication/form_error.dart';
 
-class AddAddressForm extends StatefulWidget {
+class AddAddressForm extends ConsumerStatefulWidget {
   const AddAddressForm(
       {super.key,
+      this.id,
       required this.lt,
       required this.ln,
       required this.shortAddress,
-      required this.longAddress});
+      required this.longAddress,
+      this.building,
+      this.locality,
+      this.landmark});
 
+  final int? id;
   final double lt;
   final double ln;
   final String longAddress;
   final String shortAddress;
+  final String? building;
+  final String? locality;
+  final String? landmark;
 
   @override
-  State<AddAddressForm> createState() => _AddAddressFormState();
+  ConsumerState<AddAddressForm> createState() => _AddAddressFormState();
 }
 
-class _AddAddressFormState extends State<AddAddressForm> {
+class _AddAddressFormState extends ConsumerState<AddAddressForm> {
   String _building = "";
   String _locality = "";
   String? _landmark;
@@ -44,7 +56,11 @@ class _AddAddressFormState extends State<AddAddressForm> {
         _errorDict = {};
         isLoading = true;
       });
-      final url = Uri.http(baseUrl, "/api/user/add-user-location/");
+      final url = Uri.http(
+          baseUrl,
+          widget.id != null
+              ? "/api/user/edit-user-location/${widget.id}/"
+              : "/api/user/add-user-location/");
       final Store store = box.get("storeObj", defaultValue: Store())!;
       final String authToken = store.authToken;
       http
@@ -65,8 +81,10 @@ class _AddAddressFormState extends State<AddAddressForm> {
         });
         final Map<String, dynamic> data = json.decode(response.body);
         if (data.containsKey("details")) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(data["details"])));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(data["details"]),
+            elevation: 20,
+          ));
         }
         if (response.statusCode >= 400) {
           if (data.containsKey("errors")) {
@@ -75,10 +93,44 @@ class _AddAddressFormState extends State<AddAddressForm> {
             });
           }
         } else {
-          // Navigator.of(context).pushReplacement(MaterialPageRoute(
-          //     builder: (ctx) => PasswordSent(
-          //           email: _email,
-          //         )));
+          final Map<String, dynamic> addrMap = {
+            "id": data["user_location"]["id"],
+            "latitude": data["user_location"]["latitude"],
+            "longitude": data["user_location"]["longitude"],
+            "short_address": data["user_location"]["short_address"],
+            "long_address": data["user_location"]["long_address"],
+            "building": data["user_location"]["building"],
+            "locality": data["user_location"]["locality"],
+            "landmark": data["user_location"]["landmark"],
+          };
+          if (widget.id == null) {
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => const LandingPage(),
+            ));
+            store.savedAddresses.add(addrMap);
+            box.put("storeObj", store);
+            ref.read(userLocationProvider.notifier).addUserSelectedLocation(
+                  id: addrMap["id"],
+                  lt: double.parse(addrMap["latitude"]),
+                  ln: double.parse(addrMap["longitude"]),
+                  shortAddress: addrMap["short_address"],
+                  longAddress: addrMap["long_address"],
+                  building: addrMap["building"],
+                  locality: addrMap["locality"],
+                  landmark: addrMap["landmark"],
+                );
+            ref
+                .read(homeScreenBuilderProvider.notifier)
+                .setHomeScreenUpdated(false);
+          } else {
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+            final int addrIndex = store.savedAddresses
+                .indexWhere((element) => element["id"] == addrMap["id"]);
+            store.savedAddresses[addrIndex] = addrMap;
+            box.put("storeObj", store);
+          }
         }
       }).onError((error, stackTrace) {
         setState(() {
@@ -120,6 +172,7 @@ class _AddAddressFormState extends State<AddAddressForm> {
             child: Column(
               children: [
                 TextFormField(
+                  initialValue: widget.building,
                   validator: (value) {
                     if (value == null ||
                         value.isEmpty ||
@@ -143,6 +196,7 @@ class _AddAddressFormState extends State<AddAddressForm> {
                   height: 20,
                 ),
                 TextFormField(
+                  initialValue: widget.locality,
                   validator: (value) {
                     if (value == null ||
                         value.isEmpty ||
@@ -166,6 +220,7 @@ class _AddAddressFormState extends State<AddAddressForm> {
                   height: 20,
                 ),
                 TextFormField(
+                  initialValue: widget.landmark,
                   validator: (value) {
                     if (value != null && value.trim().length > 50) {
                       return "Please enter a valid value";

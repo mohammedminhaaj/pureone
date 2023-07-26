@@ -8,7 +8,21 @@ import 'package:pureone/utils/location_services.dart';
 import 'package:pureone/widgets/add_address_modal.dart';
 
 class AddAddress extends ConsumerStatefulWidget {
-  const AddAddress({super.key});
+  const AddAddress(
+      {super.key,
+      this.id,
+      this.lt,
+      this.ln,
+      this.building,
+      this.landmark,
+      this.locality});
+
+  final int? id;
+  final double? lt;
+  final double? ln;
+  final String? building;
+  final String? locality;
+  final String? landmark;
 
   @override
   ConsumerState<AddAddress> createState() => _AddAddressState();
@@ -27,10 +41,14 @@ class _AddAddressState extends ConsumerState<AddAddress> {
         context: context,
         builder: (context) {
           return AddAddressModal(
+            id: widget.id,
             lt: _lt!,
             ln: _ln!,
             longAddress: _longAddress!,
             shortAddress: _shortAddress!,
+            building: widget.building,
+            locality: widget.locality,
+            landmark: widget.landmark,
           );
         });
   }
@@ -38,22 +56,10 @@ class _AddAddressState extends ConsumerState<AddAddress> {
   @override
   void initState() {
     super.initState();
-    getCurrentLocation().then((value) {
+    if (widget.lt != null && widget.ln != null) {
       setState(() {
-        if (value["serviceEnabled"] &&
-            value["permissionGranted"] == PermissionStatus.granted) {
-          _lt = value["location"].latitude;
-          _ln = value["location"].longitude;
-        } else {
-          final UserAddress? currentLocation = ref.read(
-              userLocationProvider.select((value) => value.currentLocation));
-          _lt = currentLocation != null && currentLocation.latitude != null
-              ? currentLocation.latitude
-              : 12.9716;
-          _ln = currentLocation != null && currentLocation.longitude != null
-              ? currentLocation.longitude
-              : 77.5946;
-        }
+        _lt = widget.lt;
+        _ln = widget.ln;
         getAddress(_lt!, _ln!).then((value) {
           setState(() {
             _longAddress = value["longAddress"];
@@ -61,7 +67,32 @@ class _AddAddressState extends ConsumerState<AddAddress> {
           });
         });
       });
-    });
+    } else {
+      getCurrentLocation().then((value) {
+        setState(() {
+          if (value["serviceEnabled"] &&
+              value["permissionGranted"] == PermissionStatus.granted) {
+            _lt = value["location"].latitude;
+            _ln = value["location"].longitude;
+          } else {
+            final UserAddress? currentLocation = ref.read(
+                userLocationProvider.select((value) => value.currentLocation));
+            _lt = currentLocation != null && currentLocation.latitude != null
+                ? currentLocation.latitude
+                : 12.9716;
+            _ln = currentLocation != null && currentLocation.longitude != null
+                ? currentLocation.longitude
+                : 77.5946;
+          }
+          getAddress(_lt!, _ln!).then((value) {
+            setState(() {
+              _longAddress = value["longAddress"];
+              _shortAddress = value["shortAddress"];
+            });
+          });
+        });
+      });
+    }
   }
 
   @override

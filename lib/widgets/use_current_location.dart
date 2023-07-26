@@ -128,20 +128,6 @@ class _UseCurrentLocationState extends ConsumerState<UseCurrentLocation> {
                                         foregroundColor: Colors.white),
                                     onPressed: _longAddress != null
                                         ? () {
-                                            ref
-                                                .read(userLocationProvider
-                                                    .notifier)
-                                                .addUserCurrentLocation(
-                                                  lt: _lt,
-                                                  ln: _ln,
-                                                  shortAddress: _shortAddress,
-                                                  longAddress: _longAddress,
-                                                );
-                                            ref
-                                                .read(homeScreenBuilderProvider
-                                                    .notifier)
-                                                .setHomeScreenUpdated(false);
-
                                             Navigator.of(context,
                                                     rootNavigator: true)
                                                 .popUntil((route) {
@@ -151,6 +137,20 @@ class _UseCurrentLocationState extends ConsumerState<UseCurrentLocation> {
                                                 MaterialPageRoute(
                                                     builder: (ctx) =>
                                                         const LandingPage()));
+                                            ref
+                                                .read(userLocationProvider
+                                                    .notifier)
+                                                .setBothLocations(
+                                                  lt: _lt,
+                                                  ln: _ln,
+                                                  shortAddress: _shortAddress,
+                                                  longAddress: _longAddress,
+                                                );
+
+                                            ref
+                                                .read(homeScreenBuilderProvider
+                                                    .notifier)
+                                                .setHomeScreenUpdated(false);
                                           }
                                         : null,
                                     label: const Text("Confirm Location"),

@@ -24,7 +24,10 @@ class ProfileOptions extends ConsumerWidget {
           context: context,
           builder: (context) => AlertDialog(
                 title: const Icon(Icons.question_mark_rounded),
-                content: const Text("Are you sure you want to logout?"),
+                content: const Text(
+                  "Are you sure you want to logout?",
+                  textAlign: TextAlign.center,
+                ),
                 actions: [
                   Row(
                     mainAxisSize: MainAxisSize.max,

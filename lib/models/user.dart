@@ -1,12 +1,14 @@
 class UserAddress {
   const UserAddress(
-      {this.latitude,
+      {this.id,
+      this.latitude,
       this.longitude,
       this.shortAddress,
       this.longAddress,
       this.building,
       this.locality,
       this.landmark});
+  final int? id;
   final double? latitude;
   final double? longitude;
   final String? shortAddress;
@@ -16,7 +18,8 @@ class UserAddress {
   final String? landmark;
 
   UserAddress copyWith(
-      {double? lt,
+      {int? id,
+      double? lt,
       double? ln,
       String? shortAddress,
       String? longAddress,
@@ -24,6 +27,7 @@ class UserAddress {
       String? locality,
       String? landmark}) {
     return UserAddress(
+        id: id ?? id,
         latitude: lt ?? latitude,
         longitude: ln ?? longitude,
         shortAddress: shortAddress ?? this.shortAddress,
@@ -31,6 +35,10 @@ class UserAddress {
         building: building ?? this.building,
         locality: locality ?? this.locality,
         landmark: landmark ?? this.landmark);
+  }
+
+  UserAddress clear() {
+    return const UserAddress();
   }
 
   List<String> get _addressComponents {
@@ -53,6 +61,10 @@ class UserAddress {
     } on RangeError {
       return "";
     }
+  }
+
+  String get inputAddress {
+    return "$building, $locality ${landmark != null && landmark != "" ? ", $landmark" : ""}";
   }
 }
 

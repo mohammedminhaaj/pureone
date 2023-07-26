@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pureone/models/user.dart';
 import 'package:pureone/providers/user_location_provider.dart';
 import 'package:pureone/widgets/add_address.dart';
+import 'package:pureone/widgets/saved_address.dart';
 import 'package:pureone/widgets/use_current_location.dart';
 
 class SelectAddressModal extends StatelessWidget {
@@ -126,27 +127,7 @@ class SelectAddressModal extends StatelessWidget {
           const SizedBox(
             height: 30,
           ),
-          const Text(
-            "Saved Addresses",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Align(
-            child: Column(children: [
-              Image.asset(
-                "assets/images/empty.png",
-                colorBlendMode: BlendMode.multiply,
-                height: 250,
-                width: 250,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              const Text("Nothing to show here.")
-            ]),
-          ),
+          const SavedAddress()
         ],
       ),
     );

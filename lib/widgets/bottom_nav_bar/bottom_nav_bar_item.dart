@@ -24,7 +24,7 @@ class CustomBottomNavigationBarItem extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(25),
       child: Container(
-        padding: const EdgeInsets.all(15),
+        padding: const EdgeInsets.all(10),
         decoration: isSelected
             ? BoxDecoration(
                 color: Theme.of(context).colorScheme.primary,
@@ -49,7 +49,7 @@ class CustomBottomNavigationBarItem extends StatelessWidget {
                   if (layer != null)
                     layer!.animate(target: isSelected ? 1 : 0).scaleXY(end: 0.8)
                 ],
-              ).animate(target: isSelected ? 1 : 0)
+              )
             else
               Icon(
                 icon,
@@ -57,19 +57,25 @@ class CustomBottomNavigationBarItem extends StatelessWidget {
                 color: Theme.of(context).colorScheme.primary,
               )
                   .animate(target: isSelected ? 1 : 0)
-                  .scaleXY(end: 0.8)
+                  .scaleXY(end: 0.7)
                   .tint(color: Colors.white),
-            const SizedBox(
-              width: 5,
+            Visibility(
+              visible: useStack && layer != null,
+              child: const SizedBox(
+                width: 5,
+              ),
             ),
             if (isSelected)
               Text(
                 label,
-                style: const TextStyle(fontSize: 18, color: Colors.white),
+                style: const TextStyle(fontSize: 14, color: Colors.white),
               )
           ],
         ),
-      ),
+      )
+          .animate(target: isSelected ? 1 : 0)
+          .shimmer()
+          .scaleXY(begin: 0.9, end: 1),
     );
   }
 }

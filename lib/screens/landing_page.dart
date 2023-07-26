@@ -73,7 +73,7 @@ class _LandingPageState extends State<LandingPage> {
                   label: userLocation.currentLocation != null
                       ? Column(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               userLocation.selectedLocation != null
