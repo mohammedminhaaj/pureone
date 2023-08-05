@@ -1,4 +1,7 @@
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:location/location.dart';
+import 'package:pureone/models/store.dart';
+import 'package:pureone/models/user.dart';
 import 'package:pureone/settings.dart' as app_settings;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -76,4 +79,31 @@ Future<Map<String, String>> getAddress(
     "longAddress": data["results"][0]["formatted_address"],
     "shortAddress": parsedGmapResponse.values.join(", ")
   };
+}
+
+UserAddress? getUserAddressWithinRadius(UserAddress currentAddress) {
+  final Box<Store> box = Hive.box<Store>("store");
+  final Store store = box.get("storeObj", defaultValue: Store())!;
+  final List<dynamic> savedAddress = store.savedAddresses;
+  if (savedAddress.isEmpty) {
+    return null;
+  }
+  const double radiusKm = 1.0;
+  final List<dynamic> addressWithinRange = savedAddress
+      .where((address) => currentAddress.distanceTo(address) <= radiusKm)
+      .toList();
+  try {
+    return UserAddress(
+      id: addressWithinRange[0]["id"],
+      latitude: double.parse(addressWithinRange[0]["latitude"]),
+      longitude: double.parse(addressWithinRange[0]["longitude"]),
+      shortAddress: addressWithinRange[0]["short_address"],
+      longAddress: addressWithinRange[0]["long_address"],
+      building: addressWithinRange[0]["building"],
+      locality: addressWithinRange[0]["locality"],
+      landmark: addressWithinRange[0]["landmark"],
+    );
+  } on RangeError {
+    return null;
+  }
 }

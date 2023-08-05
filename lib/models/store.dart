@@ -16,14 +16,23 @@ class Store {
   @HiveField(2, defaultValue: false)
   bool showUpdateProfilePopup;
 
+  //user to store current user's username
   @HiveField(3, defaultValue: "")
   String username;
 
+  //used to store current user's saved address
   @HiveField(4, defaultValue: [])
   List<dynamic> savedAddresses;
 
+  //used to store current user's email
   @HiveField(5, defaultValue: "")
   String userEmail;
+
+  //used to store user's preferred payment mode
+  //0 stands for cash
+  //check data/payment_mode.dart for mappings
+  @HiveField(6, defaultValue: 0)
+  int preferredPaymentMode;
 
   Store(
       {this.authToken = "",
@@ -31,5 +40,6 @@ class Store {
       this.showUpdateProfilePopup = false,
       this.username = "",
       this.savedAddresses = const [],
-      this.userEmail = ""});
+      this.userEmail = "",
+      this.preferredPaymentMode = 0});
 }

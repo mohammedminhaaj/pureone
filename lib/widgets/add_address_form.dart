@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pureone/models/store.dart';
+import 'package:pureone/models/user.dart';
 import 'package:pureone/providers/home_screen_builder_provider.dart';
 import 'package:pureone/providers/user_location_provider.dart';
-import 'package:pureone/screens/landing_page.dart';
 import 'package:pureone/settings.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:pureone/utils/input_decoration.dart';
 import 'package:pureone/widgets/authentication/form_error.dart';
+import 'package:pureone/widgets/modal_header.dart';
 
 class AddAddressForm extends ConsumerStatefulWidget {
   const AddAddressForm(
@@ -105,29 +106,68 @@ class _AddAddressFormState extends ConsumerState<AddAddressForm> {
           };
           if (widget.id == null) {
             Navigator.of(context).popUntil((route) => route.isFirst);
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => const LandingPage(),
-            ));
             store.savedAddresses.add(addrMap);
             box.put("storeObj", store);
-            ref.read(userLocationProvider.notifier).addUserSelectedLocation(
-                  id: addrMap["id"],
-                  lt: double.parse(addrMap["latitude"]),
-                  ln: double.parse(addrMap["longitude"]),
-                  shortAddress: addrMap["short_address"],
-                  longAddress: addrMap["long_address"],
-                  building: addrMap["building"],
-                  locality: addrMap["locality"],
-                  landmark: addrMap["landmark"],
-                );
+            final UserAddress? currentLocation = ref.read(
+                userLocationProvider.select((value) => value.currentLocation));
+            if (currentLocation == null) {
+              ref.read(userLocationProvider.notifier).setBothLocations(
+                    id: addrMap["id"],
+                    lt: double.parse(addrMap["latitude"]),
+                    ln: double.parse(addrMap["longitude"]),
+                    shortAddress: addrMap["short_address"],
+                    longAddress: addrMap["long_address"],
+                    building: addrMap["building"],
+                    locality: addrMap["locality"],
+                    landmark: addrMap["landmark"],
+                  );
+            } else {
+              ref.read(userLocationProvider.notifier).addUserSelectedLocation(
+                    id: addrMap["id"],
+                    lt: double.parse(addrMap["latitude"]),
+                    ln: double.parse(addrMap["longitude"]),
+                    shortAddress: addrMap["short_address"],
+                    longAddress: addrMap["long_address"],
+                    building: addrMap["building"],
+                    locality: addrMap["locality"],
+                    landmark: addrMap["landmark"],
+                  );
+            }
+
             ref
                 .read(homeScreenBuilderProvider.notifier)
                 .setHomeScreenUpdated(false);
           } else {
-            Navigator.of(context).pop();
-            Navigator.of(context).pop();
+            Navigator.of(context)
+              ..pop()
+              ..pop();
             final int addrIndex = store.savedAddresses
                 .indexWhere((element) => element["id"] == addrMap["id"]);
+            final UserLocation userLocation = ref.read(userLocationProvider);
+            if (userLocation.currentLocation?.id == addrMap["id"]) {
+              ref.read(userLocationProvider.notifier).addUserCurrentLocation(
+                    id: addrMap["id"],
+                    lt: double.parse(addrMap["latitude"]),
+                    ln: double.parse(addrMap["longitude"]),
+                    shortAddress: addrMap["short_address"],
+                    longAddress: addrMap["long_address"],
+                    building: addrMap["building"],
+                    locality: addrMap["locality"],
+                    landmark: addrMap["landmark"],
+                  );
+            }
+            if (userLocation.selectedLocation?.id == addrMap["id"]) {
+              ref.read(userLocationProvider.notifier).addUserSelectedLocation(
+                    id: addrMap["id"],
+                    lt: double.parse(addrMap["latitude"]),
+                    ln: double.parse(addrMap["longitude"]),
+                    shortAddress: addrMap["short_address"],
+                    longAddress: addrMap["long_address"],
+                    building: addrMap["building"],
+                    locality: addrMap["locality"],
+                    landmark: addrMap["landmark"],
+                  );
+            }
             store.savedAddresses[addrIndex] = addrMap;
             box.put("storeObj", store);
           }
@@ -148,118 +188,109 @@ class _AddAddressFormState extends ConsumerState<AddAddressForm> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          children: [
-            IconButton(
-                onPressed: () {
-                  Navigator.of(context, rootNavigator: true).pop();
-                },
-                icon: const Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  size: 30,
-                )),
-            const Text(
-              "Add Address",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            )
-          ],
-        ),
+        const ModalHeader(headerText: "Add Address"),
         const SizedBox(
-          height: 20,
+          height: 10,
         ),
         Form(
             key: _formKey,
-            child: Column(
-              children: [
-                TextFormField(
-                  initialValue: widget.building,
-                  validator: (value) {
-                    if (value == null ||
-                        value.isEmpty ||
-                        value.trim().length > 50) {
-                      return "Please enter a valid value";
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _building = value!;
-                  },
-                  decoration: setInputDecoration(
-                      context: context,
-                      label: const Text("Flat / House no / Floor / Building"),
-                      prefixIcon: const Icon(Icons.house_rounded),
-                      hasError: _errorDict.containsKey("building")),
-                ),
-                if (_errorDict.containsKey("building"))
-                  FormError(errors: _errorDict["building"]),
-                const SizedBox(
-                  height: 20,
-                ),
-                TextFormField(
-                  initialValue: widget.locality,
-                  validator: (value) {
-                    if (value == null ||
-                        value.isEmpty ||
-                        value.trim().length > 50) {
-                      return "Please enter a valid value";
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _locality = value!;
-                  },
-                  decoration: setInputDecoration(
-                      context: context,
-                      label: const Text("Area / Sector / Locality"),
-                      prefixIcon: const Icon(Icons.landscape_rounded),
-                      hasError: _errorDict.containsKey("locality")),
-                ),
-                if (_errorDict.containsKey("locality"))
-                  FormError(errors: _errorDict["locality"]),
-                const SizedBox(
-                  height: 20,
-                ),
-                TextFormField(
-                  initialValue: widget.landmark,
-                  validator: (value) {
-                    if (value != null && value.trim().length > 50) {
-                      return "Please enter a valid value";
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _landmark = value!;
-                  },
-                  decoration: setInputDecoration(
-                      context: context,
-                      label: const Text("Landmark (Optional)"),
-                      prefixIcon: const Icon(Icons.push_pin_rounded),
-                      hasError: _errorDict.containsKey("landmark")),
-                ),
-                if (_errorDict.containsKey("landmark"))
-                  FormError(errors: _errorDict["landmark"]),
-                const SizedBox(
-                  height: 20,
-                ),
-                ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: isLoading
-                            ? Theme.of(context).colorScheme.secondary
-                            : Theme.of(context).colorScheme.primary,
-                        minimumSize: const Size(400, 60)),
-                    onPressed: isLoading ? null : _submitForm,
-                    icon: isLoading
-                        ? const SizedBox(
-                            height: 16,
-                            width: 16,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Icon(Icons.check_rounded),
-                    label: const Text('Save Address')),
-              ],
+            child: Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  TextFormField(
+                    initialValue: widget.building,
+                    validator: (value) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.trim().length > 50) {
+                        return "Please enter a valid value";
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _building = value!;
+                    },
+                    decoration: setInputDecoration(
+                        context: context,
+                        label: const Text("Flat / House no / Floor / Building"),
+                        prefixIcon: const Icon(Icons.house_rounded),
+                        hasError: _errorDict.containsKey("building")),
+                  ),
+                  if (_errorDict.containsKey("building"))
+                    FormError(errors: _errorDict["building"]),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  TextFormField(
+                    initialValue: widget.locality,
+                    validator: (value) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.trim().length > 50) {
+                        return "Please enter a valid value";
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _locality = value!;
+                    },
+                    decoration: setInputDecoration(
+                        context: context,
+                        label: const Text("Area / Sector / Locality"),
+                        prefixIcon: const Icon(Icons.landscape_rounded),
+                        hasError: _errorDict.containsKey("locality")),
+                  ),
+                  if (_errorDict.containsKey("locality"))
+                    FormError(errors: _errorDict["locality"]),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  TextFormField(
+                    initialValue: widget.landmark,
+                    validator: (value) {
+                      if (value != null && value.trim().length > 50) {
+                        return "Please enter a valid value";
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _landmark = value!;
+                    },
+                    decoration: setInputDecoration(
+                        context: context,
+                        label: const Text("Landmark (Optional)"),
+                        prefixIcon: const Icon(Icons.push_pin_rounded),
+                        hasError: _errorDict.containsKey("landmark")),
+                  ),
+                  if (_errorDict.containsKey("landmark"))
+                    FormError(errors: _errorDict["landmark"]),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: isLoading
+                              ? Theme.of(context).colorScheme.secondary
+                              : Theme.of(context).colorScheme.primary,
+                          minimumSize: const Size(400, 60)),
+                      onPressed: isLoading ? null : _submitForm,
+                      icon: isLoading
+                          ? const SizedBox(
+                              height: 16,
+                              width: 16,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(Icons.check_rounded),
+                      label: const Text('Save Address')),
+                ],
+              ),
             ))
       ],
     );

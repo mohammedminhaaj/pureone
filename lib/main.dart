@@ -50,7 +50,8 @@ class App extends StatelessWidget {
           // This works for code too, not just values: Most code changes can be
           // tested with just a hot reload.
           colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color.fromARGB(255, 0, 90, 125)),
+            seedColor: const Color.fromARGB(255, 0, 90, 125),
+          ),
           bottomSheetTheme: const BottomSheetThemeData(
               backgroundColor: Colors.white,
               surfaceTintColor: Colors.white), //#005a7d

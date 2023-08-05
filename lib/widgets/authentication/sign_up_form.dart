@@ -68,9 +68,14 @@ class _SignUpFormState extends State<SignUpForm> {
           store.username = data["username"];
           store.savedAddresses = data["saved_addresses"];
           store.userEmail = data["email"] ?? "";
+          if (store.username == data["mobile"]) {
+            store.showUpdateProfilePopup = true;
+          }
           box.put("storeObj", store);
-          Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (ctx) => const LandingPage()));
+          Navigator.of(context, rootNavigator: true)
+            ..pop()
+            ..pushReplacement(
+                MaterialPageRoute(builder: (ctx) => const LandingPage()));
         }
       }).onError((error, stackTrace) {
         setState(() {
@@ -149,7 +154,7 @@ class _SignUpFormState extends State<SignUpForm> {
                       value.isEmpty ||
                       value.trim().length < 6 ||
                       value.trim().length > 128) {
-                    return 'Please enter a valid password';
+                    return 'Please enter a valid 6 character password';
                   }
                   _passwordToMatch = value;
                   return null;
@@ -177,7 +182,7 @@ class _SignUpFormState extends State<SignUpForm> {
                       value.isEmpty ||
                       value.trim().length < 6 ||
                       value.trim().length > 128) {
-                    return 'Please enter a valid password';
+                    return 'Please enter a valid 6 characters password';
                   }
                   if (_passwordToMatch != value) {
                     return "Passwords don't match";

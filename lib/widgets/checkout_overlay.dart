@@ -1,29 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pureone/data/payment_mode.dart';
+import 'package:pureone/models/store.dart';
+import 'package:pureone/widgets/payment_options.dart';
 
-class CheckoutOverlay extends StatelessWidget {
-  const CheckoutOverlay({super.key});
+class CheckoutOverlay extends StatefulWidget {
+  const CheckoutOverlay({super.key, required this.subTotal});
+
+  final double subTotal;
 
   @override
+  State<CheckoutOverlay> createState() => _CheckoutOverlayState();
+}
+
+class _CheckoutOverlayState extends State<CheckoutOverlay> {
+  @override
   Widget build(BuildContext context) {
+    final Box<Store> box = Hive.box<Store>("store");
+    final Store store = box.get("storeObj", defaultValue: Store())!;
+    final PaymentMode preferredPaymentMode =
+        PaymentMode.values[store.preferredPaymentMode];
+    final String paymentMode = paymentModeString[preferredPaymentMode]!;
+
     return Padding(
-      padding: const EdgeInsets.only(bottom: 5, left: 10, right: 10),
+      padding: const EdgeInsets.only(bottom: 5, left: 20, right: 20),
       child: Material(
         elevation: 10,
-        borderRadius: const BorderRadius.all(Radius.circular(25)),
+        borderRadius: const BorderRadius.all(Radius.circular(15)),
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(10),
           width: double.infinity,
           decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).colorScheme.primaryContainer,
-                  Colors.white
-                ],
-                tileMode: TileMode.mirror,
-                begin: Alignment.bottomRight,
-                end: Alignment.topLeft,
-              ),
-              borderRadius: const BorderRadius.all(Radius.circular(25))),
+              color:
+                  Theme.of(context).colorScheme.primaryContainer.withAlpha(50),
+              borderRadius: const BorderRadius.all(Radius.circular(15))),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -38,19 +48,35 @@ class CheckoutOverlay extends StatelessWidget {
                       shape: ContinuousRectangleBorder(
                           borderRadius: BorderRadius.circular(25)),
                     ),
-                    onPressed: () {},
+                    onPressed: () async {
+                      final PaymentMode? selectedPaymentMode =
+                          await showModalBottomSheet(
+                              isScrollControlled: true,
+                              useSafeArea: true,
+                              context: context,
+                              builder: (context) {
+                                return PaymentOptions(
+                                  paymentMode: preferredPaymentMode,
+                                );
+                              });
+                      if (selectedPaymentMode != null) {
+                        store.preferredPaymentMode = selectedPaymentMode.index;
+                        box.put("storeObj", store);
+                        setState(() {});
+                      }
+                    },
                     icon: const Icon(
                       Icons.arrow_drop_up_rounded,
                       size: 30,
                     ),
-                    label: const Column(children: [
-                      Text(
+                    label: Column(children: [
+                      const Text(
                         "Pay using",
                         style: TextStyle(fontSize: 12),
                       ),
                       Text(
-                        "Cash",
-                        style: TextStyle(
+                        paymentMode,
+                        style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       )
                     ]),
@@ -69,7 +95,16 @@ class CheckoutOverlay extends StatelessWidget {
                         ),
                         onPressed: () {},
                         icon: const Icon(Icons.shopping_cart_checkout_rounded),
-                        label: const Text("Place Order")),
+                        label: Column(
+                          children: [
+                            const Text("Place Order"),
+                            Text(
+                              "\u{20B9} ${widget.subTotal}",
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            )
+                          ],
+                        )),
                   ),
                 ],
               )

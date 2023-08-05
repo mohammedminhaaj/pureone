@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pureone/models/user.dart';
 import 'package:pureone/providers/user_location_provider.dart';
 import 'package:pureone/widgets/add_address.dart';
+import 'package:pureone/widgets/modal_header.dart';
 import 'package:pureone/widgets/saved_address.dart';
 import 'package:pureone/widgets/use_current_location.dart';
 
@@ -17,22 +18,7 @@ class SelectAddressModal extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              IconButton(
-                  onPressed: () {
-                    Navigator.of(context, rootNavigator: true).pop();
-                  },
-                  icon: const Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    size: 30,
-                  )),
-              const Text(
-                "Select Location",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              )
-            ],
-          ),
+          const ModalHeader(headerText: "Select Location"),
           const SizedBox(
             height: 20,
           ),

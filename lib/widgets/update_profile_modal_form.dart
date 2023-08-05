@@ -61,6 +61,7 @@ class _UpdateProfileModalFormState
             if (data.containsKey("errors")) {
               _errorDict = data["errors"];
             } else {
+              //Putting error under username field is something goes wrong outside form context
               _errorDict.addAll({
                 "username": ["Something went wrong!"]
               });
@@ -68,8 +69,11 @@ class _UpdateProfileModalFormState
           });
         } else {
           store.username = _username;
+          if (store.userEmail == "" && _email != "") {
+            store.userEmail = _email;
+          }
           box.put("storeObj", store);
-          Navigator.of(context, rootNavigator: true).pop();
+          Navigator.of(context).pop();
         }
       }).onError((error, stackTrace) {
         setState(() {
@@ -141,7 +145,7 @@ class _UpdateProfileModalFormState
           children: [
             TextButton(
                 onPressed: () {
-                  Navigator.of(context, rootNavigator: true).pop();
+                  Navigator.of(context).pop();
                 },
                 child: const Text("Maybe Later")),
             ElevatedButton(

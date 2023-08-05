@@ -1,3 +1,5 @@
+import 'package:pureone/models/vendor.dart';
+
 class ProductQuantity {
   ProductQuantity(
       {required this.id,
@@ -34,14 +36,17 @@ class Product {
   final String? image;
   final String name;
   final String displayName;
-  final String vendor;
+  final Vendor vendor;
   final String? description;
   final List<ProductQuantity> availableQuantities;
   final String? deletedAt;
 
   factory Product.empty() {
     return Product(
-        name: "", displayName: "", vendor: "", availableQuantities: []);
+        name: "",
+        displayName: "",
+        vendor: Vendor.empty(),
+        availableQuantities: []);
   }
 
   factory Product.fromJson(Map<dynamic, dynamic> json) {
@@ -49,7 +54,9 @@ class Product {
         name: json["name"] ?? "",
         image: json["image"],
         displayName: json["display_name"] ?? "",
-        vendor: json["vendor"] ?? "",
+        vendor: json["vendor"] != null
+            ? Vendor.fromJson(json["vendor"])
+            : Vendor.empty(),
         availableQuantities: json["product_quantity"] ?? [],
         deletedAt: json["deleted_at"],
         description: json["description"]);

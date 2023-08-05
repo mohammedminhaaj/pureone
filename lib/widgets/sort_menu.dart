@@ -11,6 +11,7 @@ class SortMenu extends StatelessWidget {
       child: SizedBox(
         height: 35,
         child: ListView.separated(
+            shrinkWrap: true,
             itemCount: sortMenuList.length,
             scrollDirection: Axis.horizontal,
             separatorBuilder: (context, index) {

@@ -43,13 +43,13 @@ class SavedAddress extends ConsumerWidget {
                     children: [
                       ElevatedButton.icon(
                           onPressed: () {
-                            Navigator.of(context, rootNavigator: true).pop();
+                            Navigator.of(context).pop();
                           },
                           icon: const Icon(Icons.close_rounded),
                           label: const Text("No")),
                       ElevatedButton.icon(
                           onPressed: () {
-                            Navigator.of(context, rootNavigator: true).pop();
+                            Navigator.of(context).pop();
                             final Box<Store> box = Hive.box<Store>("store");
                             final Store store =
                                 box.get("storeObj", defaultValue: Store())!;
@@ -91,16 +91,32 @@ class SavedAddress extends ConsumerWidget {
 
     void onTapSavedAddress(List<UserAddress> savedAddresses, int index) {
       Navigator.of(context).pop();
-      ref.read(userLocationProvider.notifier).addUserSelectedLocation(
-            id: savedAddresses[index].id,
-            lt: savedAddresses[index].latitude,
-            ln: savedAddresses[index].longitude,
-            shortAddress: savedAddresses[index].shortAddress,
-            longAddress: savedAddresses[index].longAddress,
-            building: savedAddresses[index].building,
-            locality: savedAddresses[index].locality,
-            landmark: savedAddresses[index].landmark,
-          );
+      final UserAddress? currentLocation = ref
+          .read(userLocationProvider.select((value) => value.currentLocation));
+      if (currentLocation == null) {
+        ref.read(userLocationProvider.notifier).setBothLocations(
+              id: savedAddresses[index].id,
+              lt: savedAddresses[index].latitude,
+              ln: savedAddresses[index].longitude,
+              shortAddress: savedAddresses[index].shortAddress,
+              longAddress: savedAddresses[index].longAddress,
+              building: savedAddresses[index].building,
+              locality: savedAddresses[index].locality,
+              landmark: savedAddresses[index].landmark,
+            );
+      } else {
+        ref.read(userLocationProvider.notifier).addUserSelectedLocation(
+              id: savedAddresses[index].id,
+              lt: savedAddresses[index].latitude,
+              ln: savedAddresses[index].longitude,
+              shortAddress: savedAddresses[index].shortAddress,
+              longAddress: savedAddresses[index].longAddress,
+              building: savedAddresses[index].building,
+              locality: savedAddresses[index].locality,
+              landmark: savedAddresses[index].landmark,
+            );
+      }
+
       ref.read(homeScreenBuilderProvider.notifier).setHomeScreenUpdated(false);
     }
 
@@ -115,45 +131,47 @@ class SavedAddress extends ConsumerWidget {
           const SizedBox(
             height: 20,
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: ValueListenableBuilder<Box<Store>>(
-              valueListenable: Hive.box<Store>("store").listenable(),
-              builder: (context, box, widget) {
-                final Store store = box.get("storeObj", defaultValue: Store())!;
-                final List<dynamic> addresses = store.savedAddresses;
-                final List<UserAddress> savedAddresses =
-                    addresses.map((address) {
-                  return UserAddress(
-                    id: address["id"],
-                    latitude: double.parse(address["latitude"]),
-                    longitude: double.parse(address["longitude"]),
-                    shortAddress: address["short_address"],
-                    longAddress: address["long_address"],
-                    building: address["building"],
-                    locality: address["locality"],
-                    landmark: address["landmark"],
-                  );
-                }).toList();
-                return savedAddresses.isEmpty
-                    ? Align(
-                        child: Column(children: [
-                          Image.asset(
-                            "assets/images/empty.png",
-                            colorBlendMode: BlendMode.multiply,
-                            height: 250,
-                            width: 250,
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          const Text("Nothing to show here.")
-                        ]),
-                      )
-                    : SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.6,
-                        child: ListView.separated(
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: ValueListenableBuilder<Box<Store>>(
+                valueListenable: Hive.box<Store>("store").listenable(),
+                builder: (context, box, widget) {
+                  final Store store =
+                      box.get("storeObj", defaultValue: Store())!;
+                  final List<dynamic> addresses = store.savedAddresses;
+                  final List<UserAddress> savedAddresses =
+                      addresses.map((address) {
+                    return UserAddress(
+                      id: address["id"],
+                      latitude: double.parse(address["latitude"]),
+                      longitude: double.parse(address["longitude"]),
+                      shortAddress: address["short_address"],
+                      longAddress: address["long_address"],
+                      building: address["building"],
+                      locality: address["locality"],
+                      landmark: address["landmark"],
+                    );
+                  }).toList();
+                  return savedAddresses.isEmpty
+                      ? Align(
+                          child: Column(children: [
+                            Image.asset(
+                              "assets/images/empty.png",
+                              colorBlendMode: BlendMode.multiply,
+                              height: 250,
+                              width: 250,
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            const Text("Nothing to show here.")
+                          ]),
+                        )
+                      : ListView.separated(
+                          // physics: const NeverScrollableScrollPhysics(),
                           itemCount: savedAddresses.length,
+                          shrinkWrap: true,
                           itemBuilder: (context, index) {
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -223,9 +241,9 @@ class SavedAddress extends ConsumerWidget {
                           separatorBuilder: (context, index) => const Divider(
                             height: 20,
                           ),
-                        ),
-                      );
-              },
+                        );
+                },
+              ),
             ),
           )
         ],

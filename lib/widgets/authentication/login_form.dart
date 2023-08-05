@@ -70,8 +70,11 @@ class _LoginFormState extends State<LoginForm> {
           store.username = data["username"];
           store.savedAddresses = data["saved_addresses"];
           store.userEmail = data["email"] ?? "";
+          if (store.userEmail == "" || store.username == data["mobile"]) {
+            store.showUpdateProfilePopup = true;
+          }
           box.put("storeObj", store);
-          Navigator.of(context).pushReplacement(
+          Navigator.of(context, rootNavigator: true).pushReplacement(
               MaterialPageRoute(builder: (ctx) => const LandingPage()));
         }
       }).onError((error, stackTrace) {

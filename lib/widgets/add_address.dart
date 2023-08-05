@@ -6,6 +6,7 @@ import 'package:pureone/models/user.dart';
 import 'package:pureone/providers/user_location_provider.dart';
 import 'package:pureone/utils/location_services.dart';
 import 'package:pureone/widgets/add_address_modal.dart';
+import 'package:pureone/widgets/map_search_bar.dart';
 
 class AddAddress extends ConsumerStatefulWidget {
   const AddAddress(
@@ -29,10 +30,17 @@ class AddAddress extends ConsumerStatefulWidget {
 }
 
 class _AddAddressState extends ConsumerState<AddAddress> {
+  late GoogleMapController _controller;
   double? _lt;
   double? _ln;
   String? _longAddress;
   String? _shortAddress;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   void _onClickAdd() {
     showModalBottomSheet(
@@ -51,6 +59,24 @@ class _AddAddressState extends ConsumerState<AddAddress> {
             landmark: widget.landmark,
           );
         });
+  }
+
+  void loadMap() {
+    setState(() {
+      _lt = null;
+      _ln = null;
+      _longAddress = null;
+      _shortAddress = null;
+    });
+  }
+
+  void setLtLn(double lt, double ln, String longAddress, String shortAddress) {
+    setState(() {
+      _lt = lt;
+      _ln = ln;
+      _longAddress = longAddress;
+      _shortAddress = shortAddress;
+    });
   }
 
   @override
@@ -108,6 +134,9 @@ class _AddAddressState extends ConsumerState<AddAddress> {
                 alignment: Alignment.bottomCenter,
                 children: [
                   GoogleMap(
+                      onMapCreated: (controller) {
+                        _controller = controller;
+                      },
                       onTap: (location) {
                         setState(() {
                           _lt = location.latitude;
@@ -124,6 +153,9 @@ class _AddAddressState extends ConsumerState<AddAddress> {
                       },
                       markers: {
                         Marker(
+                            draggable: true,
+                            infoWindow: const InfoWindow(
+                                title: "Your order will be delivered here."),
                             markerId: const MarkerId('currentPosition'),
                             icon: BitmapDescriptor.defaultMarkerWithHue(
                                 BitmapDescriptor.hueAzure),
@@ -135,7 +167,7 @@ class _AddAddressState extends ConsumerState<AddAddress> {
                       buildingsEnabled: false,
                       zoomControlsEnabled: false,
                       initialCameraPosition:
-                          CameraPosition(target: LatLng(_lt!, _ln!), zoom: 17)),
+                          CameraPosition(target: LatLng(_lt!, _ln!), zoom: 16)),
                   Container(
                     margin: const EdgeInsets.all(25),
                     padding: const EdgeInsets.all(20),
@@ -178,7 +210,14 @@ class _AddAddressState extends ConsumerState<AddAddress> {
                         )
                       ],
                     ),
-                  )
+                  ),
+                  Positioned(
+                      left: 10,
+                      top: 10,
+                      child: MapSearchBar(
+                        loadMap: loadMap,
+                        setLtLn: setLtLn,
+                      )),
                 ],
               )
             : const Center(

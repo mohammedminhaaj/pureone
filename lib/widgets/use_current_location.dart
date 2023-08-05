@@ -3,10 +3,10 @@ import 'package:location/location.dart';
 import 'package:pureone/models/user.dart';
 import 'package:pureone/providers/home_screen_builder_provider.dart';
 import 'package:pureone/providers/user_location_provider.dart';
-import 'package:pureone/screens/landing_page.dart';
 import 'package:pureone/utils/location_services.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:pureone/widgets/map_search_bar.dart';
 
 class UseCurrentLocation extends ConsumerStatefulWidget {
   const UseCurrentLocation({super.key});
@@ -16,10 +16,17 @@ class UseCurrentLocation extends ConsumerStatefulWidget {
 }
 
 class _UseCurrentLocationState extends ConsumerState<UseCurrentLocation> {
+  late GoogleMapController _controller;
   double? _lt;
   double? _ln;
   String? _longAddress;
   String? _shortAddress;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -50,6 +57,24 @@ class _UseCurrentLocationState extends ConsumerState<UseCurrentLocation> {
     });
   }
 
+  void loadMap() {
+    setState(() {
+      _lt = null;
+      _ln = null;
+      _longAddress = null;
+      _shortAddress = null;
+    });
+  }
+
+  void setLtLn(double lt, double ln, String longAddress, String shortAddress) {
+    setState(() {
+      _lt = lt;
+      _ln = ln;
+      _longAddress = longAddress;
+      _shortAddress = shortAddress;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,6 +88,9 @@ class _UseCurrentLocationState extends ConsumerState<UseCurrentLocation> {
                 alignment: Alignment.bottomCenter,
                 children: [
                   GoogleMap(
+                      onMapCreated: (controller) {
+                        _controller = controller;
+                      },
                       onTap: (location) {
                         setState(() {
                           _lt = location.latitude;
@@ -79,6 +107,8 @@ class _UseCurrentLocationState extends ConsumerState<UseCurrentLocation> {
                       },
                       markers: {
                         Marker(
+                            infoWindow: const InfoWindow(
+                                title: "Your order will be delivered here."),
                             markerId: const MarkerId('currentPosition'),
                             icon: BitmapDescriptor.defaultMarkerWithHue(
                                 BitmapDescriptor.hueAzure),
@@ -90,7 +120,7 @@ class _UseCurrentLocationState extends ConsumerState<UseCurrentLocation> {
                       buildingsEnabled: false,
                       zoomControlsEnabled: false,
                       initialCameraPosition:
-                          CameraPosition(target: LatLng(_lt!, _ln!), zoom: 17)),
+                          CameraPosition(target: LatLng(_lt!, _ln!), zoom: 16)),
                   Container(
                     margin: const EdgeInsets.all(25),
                     padding: const EdgeInsets.all(20),
@@ -128,15 +158,6 @@ class _UseCurrentLocationState extends ConsumerState<UseCurrentLocation> {
                                         foregroundColor: Colors.white),
                                     onPressed: _longAddress != null
                                         ? () {
-                                            Navigator.of(context,
-                                                    rootNavigator: true)
-                                                .popUntil((route) {
-                                              return route.isFirst;
-                                            });
-                                            Navigator.of(context).pushReplacement(
-                                                MaterialPageRoute(
-                                                    builder: (ctx) =>
-                                                        const LandingPage()));
                                             ref
                                                 .read(userLocationProvider
                                                     .notifier)
@@ -151,6 +172,10 @@ class _UseCurrentLocationState extends ConsumerState<UseCurrentLocation> {
                                                 .read(homeScreenBuilderProvider
                                                     .notifier)
                                                 .setHomeScreenUpdated(false);
+                                            Navigator.of(
+                                              context,
+                                            ).popUntil(
+                                                (route) => route.isFirst);
                                           }
                                         : null,
                                     label: const Text("Confirm Location"),
@@ -163,7 +188,13 @@ class _UseCurrentLocationState extends ConsumerState<UseCurrentLocation> {
                         )
                       ],
                     ),
-                  )
+                  ),
+                  Positioned(
+                      top: 10,
+                      child: MapSearchBar(
+                        loadMap: loadMap,
+                        setLtLn: setLtLn,
+                      )),
                 ],
               )
             : const Center(

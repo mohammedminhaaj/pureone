@@ -65,6 +65,13 @@ class CustomeBottomNavigationBar extends StatelessWidget {
               );
             }),
             CustomBottomNavigationBarItem(
+                icon: Icons.list_alt_rounded,
+                label: "Orders",
+                isSelected: currentScreenName == "Orders",
+                onTap: () {
+                  onMenuSelected("Orders");
+                }),
+            CustomBottomNavigationBarItem(
                 icon: Icons.person_rounded,
                 label: "Profile",
                 isSelected: currentScreenName == "Profile",

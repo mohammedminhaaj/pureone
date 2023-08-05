@@ -19,14 +19,8 @@ class VerifyOtpForm extends StatefulWidget {
 }
 
 class _VerifyOtpFormState extends State<VerifyOtpForm> {
-  final Map<int, String> _otp = {
-    0: "",
-    1: "",
-    2: "",
-    3: "",
-    4: "",
-    5: "",
-  };
+  final Map<int, String> _otp =
+      Map.fromIterable(List.generate(6, (index) => index), value: (_) => "");
 
   Map<String, dynamic> _errorDict = {};
   bool isLoading = false;
@@ -73,9 +67,15 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
           store.username = data["username"];
           store.savedAddresses = data["saved_addresses"];
           store.userEmail = data["email"] ?? "";
+          if (store.userEmail == "" || store.username == data["mobile"]) {
+            store.showUpdateProfilePopup = true;
+          }
           box.put("storeObj", store);
-          Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (ctx) => const LandingPage()));
+          Navigator.of(context, rootNavigator: true)
+            ..pop()
+            ..pop()
+            ..pushReplacement(
+                MaterialPageRoute(builder: (ctx) => const LandingPage()));
         }
       }).onError((error, stackTrace) {
         setState(() {
@@ -109,7 +109,7 @@ class _VerifyOtpFormState extends State<VerifyOtpForm> {
                         _otp[index] = value!;
                       },
                       onChanged: (value) {
-                        if (value.length == 1) {
+                        if (value.isNotEmpty) {
                           FocusScope.of(context).nextFocus();
                         } else if (value.isEmpty && index != 0) {
                           FocusScope.of(context).previousFocus();

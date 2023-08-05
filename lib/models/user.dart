@@ -1,3 +1,5 @@
+import 'dart:math';
+
 class UserAddress {
   const UserAddress(
       {this.id,
@@ -64,7 +66,27 @@ class UserAddress {
   }
 
   String get inputAddress {
-    return "$building, $locality ${landmark != null && landmark != "" ? ", $landmark" : ""}";
+    return building == null || locality == null
+        ? ""
+        : "$building, $locality ${landmark != null && landmark != "" ? ", $landmark" : ""}";
+  }
+
+  double distanceTo(Map<dynamic, dynamic> other) {
+    //Using Haversine formula to calculate distance
+    const double earthRadiusKm = 6371.0;
+    double degToRad(double deg) => deg * (pi / 180.0);
+
+    double dLat = degToRad(double.parse(other["latitude"]) - latitude!);
+    double dLon = degToRad(double.parse(other["longitude"]) - longitude!);
+
+    double a = pow(sin(dLat / 2), 2) +
+        cos(degToRad(latitude!)) *
+            cos(degToRad(double.parse(other["latitude"]))) *
+            pow(sin(dLon / 2), 2);
+
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    return earthRadiusKm * c;
   }
 }
 

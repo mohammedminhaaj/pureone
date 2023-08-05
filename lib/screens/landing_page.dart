@@ -3,6 +3,7 @@ import 'package:pureone/models/user.dart';
 import 'package:pureone/providers/user_location_provider.dart';
 import 'package:pureone/screens/cart_screen.dart';
 import 'package:pureone/screens/home_screen.dart';
+import 'package:pureone/screens/order_screen.dart';
 import 'package:pureone/screens/profile_screen.dart';
 import 'package:pureone/widgets/bottom_nav_bar/bottom_nav_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,6 +24,7 @@ class _LandingPageState extends State<LandingPage> {
     Map<String, Widget> screenMap = {
       "Home": const HomeScreen(),
       "Cart": const CartScreen(),
+      "Orders": const OrderScreen(),
       "Profile": const ProfileScreen(),
     };
 
@@ -86,28 +88,30 @@ class _LandingPageState extends State<LandingPage> {
                               overflow: TextOverflow.fade,
                               softWrap: false,
                             ),
-                            if (userLocation.selectedLocation != null &&
-                                userLocation.selectedLocation!
-                                        .secondLastAddressComponent !=
-                                    "")
-                              Text(
-                                userLocation.selectedLocation!
-                                    .secondLastAddressComponent,
-                                style: const TextStyle(fontSize: 12),
-                                overflow: TextOverflow.fade,
-                                softWrap: false,
-                              )
-                            else if (userLocation.currentLocation != null &&
-                                userLocation.currentLocation!
-                                        .secondLastAddressComponent !=
-                                    "")
-                              Text(
-                                userLocation.currentLocation!
-                                    .secondLastAddressComponent,
-                                style: const TextStyle(fontSize: 12),
-                                overflow: TextOverflow.fade,
-                                softWrap: false,
-                              )
+                            if (userLocation.selectedLocation != null)
+                              if (userLocation.selectedLocation!
+                                  .secondLastAddressComponent.isNotEmpty)
+                                Text(
+                                  userLocation.selectedLocation!
+                                      .secondLastAddressComponent,
+                                  style: const TextStyle(fontSize: 12),
+                                  overflow: TextOverflow.fade,
+                                  softWrap: false,
+                                )
+                              else
+                                const SizedBox.shrink()
+                            else if (userLocation.currentLocation != null)
+                              if (userLocation.currentLocation!
+                                  .secondLastAddressComponent.isNotEmpty)
+                                Text(
+                                  userLocation.currentLocation!
+                                      .secondLastAddressComponent,
+                                  style: const TextStyle(fontSize: 12),
+                                  overflow: TextOverflow.fade,
+                                  softWrap: false,
+                                )
+                              else
+                                const SizedBox.shrink()
                           ],
                         )
                       : const SizedBox(

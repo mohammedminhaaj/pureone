@@ -77,7 +77,12 @@ class UserLocationNotifier extends StateNotifier<UserLocation> {
   }
 
   void clearSelectedLocation() {
-    state = state.copyWith(selectedLocation: const UserAddress());
+    state = UserLocation(
+        currentLocation: state.currentLocation, selectedLocation: null);
+  }
+
+  void setSelectedLocation(UserAddress? selectedLocation) {
+    state = state.copyWith(selectedLocation: selectedLocation);
   }
 }
 

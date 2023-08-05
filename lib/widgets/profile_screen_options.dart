@@ -35,7 +35,7 @@ class ProfileOptions extends ConsumerWidget {
                     children: [
                       ElevatedButton.icon(
                           onPressed: () {
-                            Navigator.of(context, rootNavigator: true).pop();
+                            Navigator.of(context).pop();
                           },
                           icon: const Icon(Icons.close_rounded),
                           label: const Text("No")),
@@ -47,7 +47,7 @@ class ProfileOptions extends ConsumerWidget {
                             store.authToken = "";
                             box.put("storeObj", store);
                             ref.read(cartProvider.notifier).clearCart();
-                            Navigator.of(context, rootNavigator: true).pop();
+                            Navigator.of(context).pop();
                             final url =
                                 Uri.http(baseUrl, "/api/user/auth/logout/");
                             http.post(

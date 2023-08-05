@@ -22,7 +22,7 @@ class HeroContent extends StatelessWidget {
       final Store store = box.get("storeObj", defaultValue: Store())!;
       store.onboardingCompleted = true;
       box.put("storeObj", store);
-      Navigator.of(context).pushReplacement(
+      Navigator.of(context, rootNavigator: true).pushReplacement(
           MaterialPageRoute(builder: (ctx) => const LoginScreen()));
     }
 
