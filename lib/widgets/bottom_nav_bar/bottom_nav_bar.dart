@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pureone/providers/cart_provider.dart';
 import 'package:pureone/widgets/bottom_nav_bar/bottom_nav_bar_item.dart';
@@ -65,12 +66,34 @@ class CustomeBottomNavigationBar extends StatelessWidget {
               );
             }),
             CustomBottomNavigationBarItem(
-                icon: Icons.list_alt_rounded,
-                label: "Orders",
-                isSelected: currentScreenName == "Orders",
-                onTap: () {
-                  onMenuSelected("Orders");
-                }),
+              icon: Icons.list_alt_rounded,
+              label: "Orders",
+              isSelected: currentScreenName == "Orders",
+              onTap: () {
+                onMenuSelected("Orders");
+              },
+              useStack: true,
+              // layer: Positioned(
+              //   right: 0,
+              //   bottom: 0,
+              //   child: Container(
+              //     width: 16,
+              //     height: 16,
+              //     decoration: BoxDecoration(
+              //         color: currentScreenName == "Orders"
+              //             ? Colors.white
+              //             : Theme.of(context).colorScheme.primary,
+              //         borderRadius:
+              //             const BorderRadius.all(Radius.circular(50))),
+              //   )
+              //       .animate(
+              //         onPlay: (controller) => controller.loop(period: 3000.ms),
+              //       )
+              //       .fadeOut(duration: 3000.ms, delay: 3000.ms)
+              //       .scaleXY(
+              //           begin: 0, end: 1.5, duration: 3000.ms, delay: 3000.ms),
+              // ),
+            ),
             CustomBottomNavigationBarItem(
                 icon: Icons.person_rounded,
                 label: "Profile",

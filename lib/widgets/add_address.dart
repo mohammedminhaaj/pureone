@@ -36,6 +36,21 @@ class _AddAddressState extends ConsumerState<AddAddress> {
   String? _longAddress;
   String? _shortAddress;
 
+  BitmapDescriptor markerIcon =
+      BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure);
+
+  void addHomeIcon() {
+    BitmapDescriptor.fromAssetImage(
+            const ImageConfiguration(), "assets/images/home-marker.bmp")
+        .then(
+      (icon) {
+        setState(() {
+          markerIcon = icon;
+        });
+      },
+    );
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -81,6 +96,7 @@ class _AddAddressState extends ConsumerState<AddAddress> {
 
   @override
   void initState() {
+    addHomeIcon();
     super.initState();
     if (widget.lt != null && widget.ln != null) {
       setState(() {
@@ -157,8 +173,7 @@ class _AddAddressState extends ConsumerState<AddAddress> {
                             infoWindow: const InfoWindow(
                                 title: "Your order will be delivered here."),
                             markerId: const MarkerId('currentPosition'),
-                            icon: BitmapDescriptor.defaultMarkerWithHue(
-                                BitmapDescriptor.hueAzure),
+                            icon: markerIcon,
                             position: LatLng(_lt!, _ln!))
                       },
                       mapToolbarEnabled: false,
@@ -212,7 +227,6 @@ class _AddAddressState extends ConsumerState<AddAddress> {
                     ),
                   ),
                   Positioned(
-                      left: 10,
                       top: 10,
                       child: MapSearchBar(
                         loadMap: loadMap,

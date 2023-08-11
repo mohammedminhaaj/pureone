@@ -63,7 +63,7 @@ class CartNotifier extends StateNotifier<List<Cart>> {
             selectedQuantity: selectedQuantity,
             quantityCount: quantityCount)
       ];
-      url = Uri.http(baseUrl, "/api/product/edit-cart/${product.name}/");
+      url = Uri.http(baseUrl, "/api/cart/edit-cart/${product.name}/");
     } else {
       //add the item if it does not exists
       state = [
@@ -73,10 +73,10 @@ class CartNotifier extends StateNotifier<List<Cart>> {
             selectedQuantity: selectedQuantity,
             quantityCount: quantityCount)
       ];
-      url = Uri.http(baseUrl, "/api/product/add-cart/");
+      url = Uri.http(baseUrl, "/api/cart/add-cart/");
     }
     return http.post(url,
-        headers: {...requestHeader, "Authorization": "Token $authToken"},
+        headers: getAuthorizationHeaders(authToken),
         body: json.encode({
           "product_quantity_id": selectedQuantity.id,
           "quantity_count": quantityCount,
@@ -91,11 +91,11 @@ class CartNotifier extends StateNotifier<List<Cart>> {
           element.selectedQuantity.id != selectedQuantity.id)
     ];
 
-    final url = Uri.http(baseUrl, "/api/product/delete-cart/");
+    final url = Uri.http(baseUrl, "/api/cart/delete-cart/");
     final Store store = box.get("storeObj", defaultValue: Store())!;
     final String authToken = store.authToken;
     http.delete(url,
-        headers: {...requestHeader, "Authorization": "Token $authToken"},
+        headers: getAuthorizationHeaders(authToken),
         body: json.encode({
           "product_quantity_id": selectedQuantity.id,
         }));
@@ -106,11 +106,11 @@ class CartNotifier extends StateNotifier<List<Cart>> {
       ...state.where(
           (element) => !vendorList.contains(element.product.vendor.displayName))
     ];
-    final url = Uri.http(baseUrl, "/api/product/delete-cart/vendor-list/");
+    final url = Uri.http(baseUrl, "/api/cart/delete-cart/vendor-list/");
     final Store store = box.get("storeObj", defaultValue: Store())!;
     final String authToken = store.authToken;
     http.delete(url,
-        headers: {...requestHeader, "Authorization": "Token $authToken"},
+        headers: getAuthorizationHeaders(authToken),
         body: json.encode({
           "vendor_list": vendorList,
         }));

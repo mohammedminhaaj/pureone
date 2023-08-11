@@ -75,10 +75,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   .toString()
             });
             //get initial home screen data
-            http.get(url, headers: {
-              ...requestHeader,
-              "Authorization": "Token $token"
-            }).then((response) {
+            http
+                .get(url, headers: getAuthorizationHeaders(token))
+                .then((response) {
               //check if the response has any errors
               if (response.statusCode >= 400) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -134,10 +133,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   userLocation.currentLocation?.longitude)
               .toString()
         });
-        http.get(url, headers: {
-          ...requestHeader,
-          "Authorization": "Token $token"
-        }).then((response) {
+        http.get(url, headers: getAuthorizationHeaders(token)).then((response) {
           if (response.statusCode >= 400) {
             ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Something went wrong!")));

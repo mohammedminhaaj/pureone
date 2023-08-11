@@ -16,6 +16,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:pureone/widgets/delivery_details.dart';
+import 'package:pureone/widgets/delivery_instructions.dart';
 
 class CartScreen extends ConsumerStatefulWidget {
   const CartScreen({super.key});
@@ -29,6 +30,8 @@ class _CartScreenState extends ConsumerState<CartScreen> {
   final Box<Store> box = Hive.box<Store>("store");
   Map<dynamic, dynamic> vendorErrors = {};
   double deliveryCharge = 0.0;
+  final ScrollController _scrollController = ScrollController();
+  String? deliveryInstructions;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +49,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         (previousValue, element) => previousValue + element.getCalculatedPrice);
     double subTotal = totalPrice + deliveryCharge;
     if (isLoading) {
-      final Uri url = Uri.http(baseUrl, "/api/product/get-cart/", {
+      final Uri url = Uri.http(baseUrl, "/api/cart/get-cart/", {
         'lt': (userLocation.selectedLocation?.latitude ??
                 userLocation.currentLocation?.latitude)
             .toString(),
@@ -56,10 +59,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
       });
       final Store store = box.get("storeObj", defaultValue: Store())!;
       final String authToken = store.authToken;
-      http.get(url, headers: {
-        ...requestHeader,
-        "Authorization": "Token $authToken"
-      }).then((response) {
+      http
+          .get(url, headers: getAuthorizationHeaders(authToken))
+          .then((response) {
         final Map<dynamic, dynamic> data = json.decode(response.body);
         ref.read(cartProvider.notifier).generateCartList(data["cart"]);
         setState(() {
@@ -67,8 +69,13 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           deliveryCharge = data["delivery_charge"];
           isLoading = false;
         });
+      }).onError((error, stackTrace) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Something went wrong")));
       });
     }
+
     return RefreshIndicator(
       onRefresh: () {
         return Future(() {
@@ -83,9 +90,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset("assets/images/no-data.png"),
+                    Image.asset("assets/images/empty-cart.png"),
                     const Text(
-                      "Nothing to show here.",
+                      "Your cart is empty",
                       style: TextStyle(fontSize: 20),
                     )
                   ],
@@ -95,6 +102,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   clipBehavior: Clip.none,
                   children: [
                     SingleChildScrollView(
+                        controller: _scrollController,
                         padding: const EdgeInsets.only(bottom: 60),
                         physics: const AlwaysScrollableScrollPhysics(),
                         child: Container(
@@ -168,7 +176,24 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                   InkWell(
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(25)),
-                                    onTap: () {},
+                                    onTap: () async {
+                                      final String? instructions =
+                                          await showModalBottomSheet(
+                                              isScrollControlled: true,
+                                              useSafeArea: true,
+                                              context: context,
+                                              builder: (context) {
+                                                return DeliveryInstructions(
+                                                  instructions:
+                                                      deliveryInstructions,
+                                                );
+                                              });
+                                      if (instructions != null) {
+                                        setState(() {
+                                          deliveryInstructions = instructions;
+                                        });
+                                      }
+                                    },
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -185,9 +210,54 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                             const SizedBox(
                                               width: 20,
                                             ),
-                                            const Text(
-                                              "Add delivery instructions",
-                                              style: TextStyle(fontSize: 15),
+                                            Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                const Text(
+                                                  "Add delivery instructions",
+                                                  style:
+                                                      TextStyle(fontSize: 15),
+                                                ),
+                                                Visibility(
+                                                  visible:
+                                                      deliveryInstructions !=
+                                                          null,
+                                                  child: const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                ),
+                                                Visibility(
+                                                    visible:
+                                                        deliveryInstructions !=
+                                                            null,
+                                                    child: SizedBox(
+                                                      width:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width *
+                                                              0.7,
+                                                      child: Text(
+                                                        deliveryInstructions ??
+                                                            "",
+                                                        style: TextStyle(
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .primary,
+                                                            decoration:
+                                                                TextDecoration
+                                                                    .underline,
+                                                            decorationStyle:
+                                                                TextDecorationStyle
+                                                                    .dashed),
+                                                        softWrap: false,
+                                                        overflow:
+                                                            TextOverflow.fade,
+                                                      ),
+                                                    ))
+                                              ],
                                             ),
                                           ],
                                         ),
@@ -211,9 +281,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                       SizedBox(
                                         width: 10,
                                       ),
-                                      Text(
-                                        "No offers are available at the moment.",
-                                        style: TextStyle(fontSize: 16),
+                                      Flexible(
+                                        child: Text(
+                                          "No offers are available at the moment.",
+                                          style: TextStyle(fontSize: 16),
+                                        ),
                                       ),
                                     ],
                                   )),
@@ -232,7 +304,18 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                           ),
                         )),
                     CheckoutOverlay(
+                      deliveryInstructions: deliveryInstructions,
                       subTotal: subTotal,
+                      scrollController: _scrollController,
+                      hasErrors: userLocation.selectedLocation == null ||
+                          (vendorErrors.containsKey("CLOSED") &&
+                              cartItems.any((element) => vendorErrors["CLOSED"]
+                                  .contains(
+                                      element.product.vendor.displayName))) ||
+                          (vendorErrors.containsKey("UNDELIVERABLE") &&
+                              cartItems.any((element) =>
+                                  vendorErrors["UNDELIVERABLE"].contains(
+                                      element.product.vendor.displayName))),
                     )
                   ],
                 )

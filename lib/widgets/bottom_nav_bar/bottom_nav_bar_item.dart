@@ -7,14 +7,14 @@ class CustomBottomNavigationBarItem extends StatelessWidget {
       required this.icon,
       required this.label,
       required this.isSelected,
-      required this.onTap,
+      this.onTap,
       this.useStack = false,
       this.layer});
 
   final IconData icon;
   final String label;
   final bool isSelected;
-  final void Function() onTap;
+  final void Function()? onTap;
   final bool useStack;
   final Widget? layer;
 

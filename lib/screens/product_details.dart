@@ -105,10 +105,7 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
       final url = Uri.http(baseUrl, "/api/product/get-product/${widget.name}/");
       final Store store = box.get("storeObj", defaultValue: Store())!;
       final String token = store.authToken;
-      http.get(url, headers: {
-        ...requestHeader,
-        "Authorization": "Token $token"
-      }).then((response) {
+      http.get(url, headers: getAuthorizationHeaders(token)).then((response) {
         final Map<dynamic, dynamic> data = json.decode(response.body);
         setState(() {
           isLoading = false;

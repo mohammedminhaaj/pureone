@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pureone/models/store.dart';
 import 'package:pureone/providers/cart_provider.dart';
 import 'package:pureone/providers/home_screen_builder_provider.dart';
+import 'package:pureone/providers/user_location_provider.dart';
 import 'package:pureone/screens/login.dart';
 import 'package:pureone/settings.dart';
 import 'package:pureone/widgets/profile_option.dart';
@@ -47,15 +48,15 @@ class ProfileOptions extends ConsumerWidget {
                             store.authToken = "";
                             box.put("storeObj", store);
                             ref.read(cartProvider.notifier).clearCart();
+                            ref
+                                .read(userLocationProvider.notifier)
+                                .clearSelectedLocation();
                             Navigator.of(context).pop();
                             final url =
                                 Uri.http(baseUrl, "/api/user/auth/logout/");
                             http.post(
                               url,
-                              headers: {
-                                ...requestHeader,
-                                "Authorization": "Token $authToken"
-                              },
+                              headers: getAuthorizationHeaders(authToken),
                             );
                             Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(
@@ -72,11 +73,6 @@ class ProfileOptions extends ConsumerWidget {
     return Column(
       children: [
         ProfileOptionContainer(header: "Account", children: [
-          ProfileOption(
-            label: "My Orders",
-            icon: Icons.restaurant_menu_rounded,
-            onTap: () {},
-          ),
           ProfileOption(
             label: "My Reviews",
             icon: Icons.reviews_rounded,

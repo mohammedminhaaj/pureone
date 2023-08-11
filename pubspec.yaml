@@ -44,6 +44,8 @@ dependencies:
   cached_network_image: ^3.2.3
   location: ^5.0.0
   google_maps_flutter: ^2.3.1
+  url_launcher: ^6.1.12
+  web_socket_channel: ^2.4.0
 
 dev_dependencies:
   flutter_test:

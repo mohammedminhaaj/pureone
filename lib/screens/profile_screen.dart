@@ -23,7 +23,7 @@ class ProfileScreen extends StatelessWidget {
           Row(
             children: [
               Material(
-                elevation: 10,
+                elevation: 5,
                 borderRadius: const BorderRadius.all(Radius.circular(60)),
                 child: CircleAvatar(
                   radius: 60,

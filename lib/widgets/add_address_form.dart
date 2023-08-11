@@ -66,7 +66,7 @@ class _AddAddressFormState extends ConsumerState<AddAddressForm> {
       final String authToken = store.authToken;
       http
           .post(url,
-              headers: {...requestHeader, "Authorization": "Token $authToken"},
+              headers: getAuthorizationHeaders(authToken),
               body: json.encode({
                 "latitude": widget.lt,
                 "longitude": widget.ln,

@@ -45,7 +45,7 @@ class _UpdateProfileModalFormState
       }
       http
           .post(url,
-              headers: {...requestHeader, "Authorization": "Token $authToken"},
+              headers: getAuthorizationHeaders(authToken),
               body: json.encode(jsonData))
           .then((response) {
         setState(() {

@@ -4,13 +4,15 @@ class Vendor {
       required this.latitude,
       required this.longitude,
       required this.address,
-      required this.status});
+      required this.status,
+      required this.contact});
 
   final String displayName;
   final double latitude;
   final double longitude;
   final String address;
   final String status;
+  final String contact;
 
   factory Vendor.fromJson(Map<dynamic, dynamic> json) {
     return Vendor(
@@ -18,6 +20,7 @@ class Vendor {
         latitude: double.parse(json["latitude"]),
         longitude: double.parse(json["longitude"]),
         address: json["address"],
+        contact: json["contact"],
         status: json["vendor_status"]);
   }
 
@@ -27,6 +30,7 @@ class Vendor {
         latitude: 0.0,
         longitude: 0.0,
         address: "",
+        contact: "",
         status: "");
   }
 }

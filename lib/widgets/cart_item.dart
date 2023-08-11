@@ -22,7 +22,7 @@ class CartItem extends ConsumerWidget {
     final ValueNotifier<bool> quantityCountChanged = ValueNotifier(false);
     final Box<Store> box = Hive.box<Store>("store");
     final url = Uri.http(
-        baseUrl, "/api/product/edit-cart/quantity-count/${cart.product.name}/");
+        baseUrl, "/api/cart/edit-cart/quantity-count/${cart.product.name}/");
     final Store store = box.get("storeObj", defaultValue: Store())!;
     final String authToken = store.authToken;
 
@@ -78,14 +78,14 @@ class CartItem extends ConsumerWidget {
                 children: [
                   Material(
                     elevation: 5,
-                    borderRadius: const BorderRadius.all(Radius.circular(25)),
+                    borderRadius: const BorderRadius.all(Radius.circular(15)),
                     child: Container(
                       height: 100,
                       width: 100,
                       decoration: BoxDecoration(
                           color: Colors.grey,
                           borderRadius:
-                              const BorderRadius.all(Radius.circular(25)),
+                              const BorderRadius.all(Radius.circular(15)),
                           image: DecorationImage(
                               fit: BoxFit.cover,
                               image: CachedNetworkImageProvider(
@@ -179,10 +179,7 @@ class CartItem extends ConsumerWidget {
                             quantityCountChanged.value = true;
                             http
                                 .post(url,
-                                    headers: {
-                                      ...requestHeader,
-                                      "Authorization": "Token $authToken"
-                                    },
+                                    headers: getAuthorizationHeaders(authToken),
                                     body: json.encode(
                                         {"quantity_count": quantityCount + 1}))
                                 .then((response) {
@@ -219,10 +216,8 @@ class CartItem extends ConsumerWidget {
                             } else {
                               http
                                   .post(url,
-                                      headers: {
-                                        ...requestHeader,
-                                        "Authorization": "Token $authToken"
-                                      },
+                                      headers:
+                                          getAuthorizationHeaders(authToken),
                                       body: json.encode({
                                         "quantity_count": quantityCount - 1
                                       }))

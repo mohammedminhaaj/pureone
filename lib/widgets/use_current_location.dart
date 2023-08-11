@@ -21,6 +21,20 @@ class _UseCurrentLocationState extends ConsumerState<UseCurrentLocation> {
   double? _ln;
   String? _longAddress;
   String? _shortAddress;
+  BitmapDescriptor markerIcon =
+      BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure);
+
+  void addHomeIcon() {
+    BitmapDescriptor.fromAssetImage(
+            const ImageConfiguration(), "assets/images/home-marker.bmp")
+        .then(
+      (icon) {
+        setState(() {
+          markerIcon = icon;
+        });
+      },
+    );
+  }
 
   @override
   void dispose() {
@@ -30,6 +44,7 @@ class _UseCurrentLocationState extends ConsumerState<UseCurrentLocation> {
 
   @override
   void initState() {
+    addHomeIcon();
     super.initState();
     getCurrentLocation().then((value) {
       setState(() {
@@ -110,8 +125,7 @@ class _UseCurrentLocationState extends ConsumerState<UseCurrentLocation> {
                             infoWindow: const InfoWindow(
                                 title: "Your order will be delivered here."),
                             markerId: const MarkerId('currentPosition'),
-                            icon: BitmapDescriptor.defaultMarkerWithHue(
-                                BitmapDescriptor.hueAzure),
+                            icon: markerIcon,
                             position: LatLng(_lt!, _ln!))
                       },
                       mapToolbarEnabled: false,

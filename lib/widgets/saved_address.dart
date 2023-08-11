@@ -72,10 +72,8 @@ class SavedAddress extends ConsumerWidget {
                                   .read(homeScreenBuilderProvider.notifier)
                                   .setHomeScreenUpdated(false);
                             }
-                            http.delete(url, headers: {
-                              ...requestHeader,
-                              "Authorization": "Token $authToken"
-                            });
+                            http.delete(url,
+                                headers: getAuthorizationHeaders(authToken));
                             ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                     content: Text(
@@ -168,78 +166,84 @@ class SavedAddress extends ConsumerWidget {
                             const Text("Nothing to show here.")
                           ]),
                         )
-                      : ListView.separated(
-                          // physics: const NeverScrollableScrollPhysics(),
-                          itemCount: savedAddresses.length,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: InkWell(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(25)),
-                                    onTap: () {
-                                      onTapSavedAddress(savedAddresses, index);
-                                    },
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          height: 30,
-                                          width: 30,
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary),
-                                          child: Center(
-                                            child: Text(
-                                              (index + 1).toString(),
-                                              style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold),
+                      : Scrollbar(
+                          child: ListView.separated(
+                            // physics: const NeverScrollableScrollPhysics(),
+                            itemCount: savedAddresses.length,
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              return Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: InkWell(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(25)),
+                                      onTap: () {
+                                        onTapSavedAddress(
+                                            savedAddresses, index);
+                                      },
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            height: 30,
+                                            width: 30,
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(50),
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary),
+                                            child: Center(
+                                              child: Text(
+                                                (index + 1).toString(),
+                                                style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        Flexible(
-                                          child: Text(savedAddresses[index]
-                                              .inputAddress),
-                                        )
-                                      ],
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Flexible(
+                                            child: Text(savedAddresses[index]
+                                                .inputAddress),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        onPressed: () {
-                                          onClickEdit(savedAddresses, index);
-                                        },
-                                        icon: const Icon(
-                                            Icons.edit_location_alt_outlined)),
-                                    IconButton(
-                                        color: Colors.red[400],
-                                        onPressed: () {
-                                          onClickDelete(savedAddresses, index);
-                                        },
-                                        icon: const Icon(
-                                            Icons.delete_outline_rounded))
-                                  ],
-                                )
-                              ],
-                            );
-                          },
-                          separatorBuilder: (context, index) => const Divider(
-                            height: 20,
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                          onPressed: () {
+                                            onClickEdit(savedAddresses, index);
+                                          },
+                                          icon: const Icon(Icons
+                                              .edit_location_alt_outlined)),
+                                      IconButton(
+                                          color: Colors.red[400],
+                                          onPressed: () {
+                                            onClickDelete(
+                                                savedAddresses, index);
+                                          },
+                                          icon: const Icon(
+                                              Icons.delete_outline_rounded))
+                                    ],
+                                  )
+                                ],
+                              );
+                            },
+                            separatorBuilder: (context, index) => const Divider(
+                              height: 20,
+                            ),
                           ),
                         );
                 },

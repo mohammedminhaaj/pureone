@@ -1,3 +1,4 @@
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:location/location.dart';
 import 'package:pureone/models/store.dart';
@@ -5,6 +6,7 @@ import 'package:pureone/models/user.dart';
 import 'package:pureone/settings.dart' as app_settings;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:math' as math;
 
 Map<String, String> parseGmapResponse(List<dynamic> addressComponents) {
   final List<String> typesToExtract = [
@@ -106,4 +108,20 @@ UserAddress? getUserAddressWithinRadius(UserAddress currentAddress) {
   } on RangeError {
     return null;
   }
+}
+
+LatLngBounds getLatLngBounds(List<List<double>> list) {
+  double? x0, x1, y0, y1;
+
+  for (final latLng in list) {
+    x0 = x0 == null ? latLng[0] : math.min(x0, latLng[0]);
+    x1 = x1 == null ? latLng[0] : math.max(x1, latLng[0]);
+    y0 = y0 == null ? latLng[1] : math.min(y0, latLng[1]);
+    y1 = y1 == null ? latLng[1] : math.max(y1, latLng[1]);
+  }
+
+  return LatLngBounds(
+    northeast: LatLng(x1!, y1!),
+    southwest: LatLng(x0!, y0!),
+  );
 }
