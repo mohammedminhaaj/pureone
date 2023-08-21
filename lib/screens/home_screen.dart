@@ -225,20 +225,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   itemBuilder: (_, index) {
                                     final Map<String, dynamic> currentProduct =
                                         allProducts[index];
+
                                     return ProductCard(
                                         image: currentProduct["image"],
                                         name: currentProduct["name"],
                                         displayName:
                                             currentProduct["display_name"],
-                                        quantity:
-                                            currentProduct["product_quantity"]
-                                                ["quantity"],
-                                        price:
-                                            currentProduct["product_quantity"]
-                                                ["price"],
+                                        quantity: currentProduct["quantity"],
+                                        price: currentProduct["price"],
+                                        rating: currentProduct["rating"],
                                         originalPrice:
-                                            currentProduct["product_quantity"]
-                                                ["original_price"]);
+                                            currentProduct["original_price"]);
                                   }),
                             ),
                           ),

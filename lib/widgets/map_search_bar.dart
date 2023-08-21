@@ -61,6 +61,13 @@ class _MapSearchBarState extends State<MapSearchBar> {
           });
 
           _debounceTimer!.cancel();
+        }).onError((error, stackTrace) {
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(const SnackBar(
+                content:
+                    Text("Something went wrong while searching location")));
+          _debounceTimer!.cancel();
         });
       });
     }
@@ -88,7 +95,7 @@ class _MapSearchBarState extends State<MapSearchBar> {
               },
               decoration: InputDecoration(
                   suffixIcon: searchText.isNotEmpty
-                      ? InkWell(
+                      ? GestureDetector(
                           onTap: () {
                             _controller.clear();
                             setState(() {

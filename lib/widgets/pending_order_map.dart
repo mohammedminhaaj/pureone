@@ -95,9 +95,13 @@ class _PendingOrderMapState extends State<PendingOrderMap> {
         initialCameraPosition: CameraPosition(target: LatLng(lt, ln), zoom: 16),
         onMapCreated: (controller) {
           _controller = controller;
+          _controller.showMarkerInfoWindow(const MarkerId('orderPosition'));
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            _controller.animateCamera(CameraUpdate.newLatLngBounds(
-                getLatLngBounds(allCoordinates), 40.0));
+            Future.delayed(const Duration(milliseconds: 1500), () {
+              _controller.animateCamera(CameraUpdate.newLatLngBounds(
+                  getLatLngBounds(allCoordinates), 40.0));
+              _controller.hideMarkerInfoWindow(const MarkerId('orderPosition'));
+            });
           });
         },
         markers: markers,

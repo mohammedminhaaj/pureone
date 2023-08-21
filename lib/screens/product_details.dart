@@ -74,7 +74,7 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
             action: SnackBarAction(
                 label: "View",
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context).popUntil((route) => route.isFirst);
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (ctx) => const LandingPage(
                             redirectTo: "Cart",
@@ -135,6 +135,8 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
           }
         });
       }).onError((error, stackTrace) {
+        print(error);
+        print(stackTrace);
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Something went wrong!")));
@@ -217,19 +219,20 @@ class _ProductDetailState extends ConsumerState<ProductDetail> {
                                           color: Colors.grey,
                                         ),
                                       )),
-                                  TextButton.icon(
-                                      onPressed: () {},
-                                      icon: Icon(
-                                        Icons.star_rounded,
-                                        color: Colors.amber[500],
-                                      ),
-                                      label: const Text(
-                                        "4.3",
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          color: Colors.grey,
+                                  if (product.rating != null)
+                                    TextButton.icon(
+                                        onPressed: () {},
+                                        icon: Icon(
+                                          Icons.star_rounded,
+                                          color: Colors.amber[500],
                                         ),
-                                      )),
+                                        label: Text(
+                                          product.rating!.toStringAsFixed(1),
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.grey,
+                                          ),
+                                        )),
                                 ],
                               ),
                               Row(

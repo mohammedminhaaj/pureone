@@ -7,18 +7,16 @@ import 'package:pureone/screens/login.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pureone/screens/onboarding_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-      .then((fn) {
-    Hive.initFlutter().then((fn) {
-      Hive.registerAdapter(StoreAdapter());
-      Hive.openBox<Store>("store").then((fn) {
-        runApp(const ProviderScope(child: App()));
-      });
-    });
-  });
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  await Hive.initFlutter();
+  Hive.registerAdapter(StoreAdapter());
+  await Hive.openBox<Store>("store");
+  await Firebase.initializeApp();
+  runApp(const ProviderScope(child: App()));
 }
 
 class App extends StatelessWidget {

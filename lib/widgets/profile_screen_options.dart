@@ -45,22 +45,24 @@ class ProfileOptions extends ConsumerWidget {
                             ref
                                 .read(homeScreenBuilderProvider.notifier)
                                 .setHomeScreenUpdated(false);
-                            store.authToken = "";
-                            box.put("storeObj", store);
                             ref.read(cartProvider.notifier).clearCart();
                             ref
                                 .read(userLocationProvider.notifier)
                                 .clearSelectedLocation();
-                            Navigator.of(context).pop();
+                            store.authToken = "";
+                            store.preferredPaymentMode = 0;
+                            store.fcmTokenStored = false;
+                            box.put("storeObj", store);
                             final url =
                                 Uri.http(baseUrl, "/api/user/auth/logout/");
                             http.post(
                               url,
                               headers: getAuthorizationHeaders(authToken),
                             );
-                            Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (ctx) => const LoginScreen()));
+                            Navigator.of(context)
+                              ..pop()
+                              ..pushReplacement(MaterialPageRoute(
+                                  builder: (ctx) => const LoginScreen()));
                           },
                           icon: const Icon(Icons.check_rounded),
                           label: const Text("Yes")),

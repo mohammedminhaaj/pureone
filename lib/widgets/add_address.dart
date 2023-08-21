@@ -152,6 +152,8 @@ class _AddAddressState extends ConsumerState<AddAddress> {
                   GoogleMap(
                       onMapCreated: (controller) {
                         _controller = controller;
+                        _controller.showMarkerInfoWindow(
+                            const MarkerId('currentPosition'));
                       },
                       onTap: (location) {
                         setState(() {

@@ -105,6 +105,8 @@ class _UseCurrentLocationState extends ConsumerState<UseCurrentLocation> {
                   GoogleMap(
                       onMapCreated: (controller) {
                         _controller = controller;
+                        _controller.showMarkerInfoWindow(
+                            const MarkerId('currentPosition'));
                       },
                       onTap: (location) {
                         setState(() {

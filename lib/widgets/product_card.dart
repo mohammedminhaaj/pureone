@@ -4,22 +4,23 @@ import 'package:pureone/screens/product_details.dart';
 import 'package:pureone/settings.dart';
 
 class ProductCard extends StatelessWidget {
-  const ProductCard({
-    super.key,
-    required this.image,
-    required this.name,
-    required this.displayName,
-    required this.quantity,
-    required this.price,
-    required this.originalPrice,
-  });
+  const ProductCard(
+      {super.key,
+      required this.image,
+      required this.name,
+      required this.displayName,
+      required this.quantity,
+      required this.price,
+      required this.originalPrice,
+      this.rating});
 
   final String image;
   final String name;
   final String displayName;
   final String quantity;
-  final String price;
-  final String originalPrice;
+  final double price;
+  final double originalPrice;
+  final double? rating;
 
   @override
   Widget build(BuildContext context) {
@@ -54,22 +55,32 @@ class ProductCard extends StatelessWidget {
                       const BoxConstraints(maxWidth: 150, maxHeight: 150),
                 ),
               ),
-              Positioned(
-                  top: 10,
-                  right: 10,
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(25))),
-                    width: 25,
-                    height: 25,
-                    child: const Icon(
-                      Icons.arrow_outward_rounded,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                  )),
+              if (rating != null)
+                Positioned(
+                    top: 10,
+                    right: 10,
+                    child: Material(
+                      elevation: 5,
+                      borderRadius: const BorderRadius.all(Radius.circular(25)),
+                      child: Container(
+                        padding: const EdgeInsets.only(
+                            left: 2, right: 7, top: 2, bottom: 2),
+                        decoration: const BoxDecoration(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(25))),
+                        child: Row(children: [
+                          Icon(
+                            Icons.star_rounded,
+                            color: Colors.amber[500],
+                            size: 20,
+                          ),
+                          Text(
+                            rating!.toStringAsFixed(1),
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                        ]),
+                      ),
+                    )),
               Positioned(
                 bottom: -60,
                 child: Material(
@@ -109,15 +120,14 @@ class ProductCard extends StatelessWidget {
                               RichText(
                                   text: TextSpan(children: [
                                 TextSpan(
-                                  text:
-                                      "\u{20B9}${originalPrice.split(".")[0]}",
+                                  text: "\u{20B9}${originalPrice.toInt()}",
                                   style: const TextStyle(
                                       color: Colors.grey,
                                       fontSize: 13,
                                       decoration: TextDecoration.lineThrough),
                                 ),
                                 TextSpan(
-                                  text: "  \u{20B9}${price.split(".")[0]}",
+                                  text: "  \u{20B9}${price.toInt()}",
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pureone/widgets/elevated_container.dart';
 
 class CartSection extends StatelessWidget {
   const CartSection({super.key, this.header, required this.child});
@@ -24,17 +25,7 @@ class CartSection extends StatelessWidget {
               height: 10,
             ),
           ),
-          Material(
-            elevation: 5,
-            borderRadius: const BorderRadius.all(Radius.circular(20)),
-            child: Container(
-              margin: const EdgeInsets.all(10),
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(20))),
-              child: child,
-            ),
-          )
+          ElevatedContainer(radius: 20, child: child)
         ],
       ),
     );

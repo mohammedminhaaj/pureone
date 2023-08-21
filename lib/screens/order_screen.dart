@@ -14,6 +14,7 @@ import 'dart:convert';
 import 'package:pureone/settings.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class OrderScreen extends ConsumerStatefulWidget {
   const OrderScreen({super.key});
@@ -29,9 +30,13 @@ class _OrderScreenState extends ConsumerState<OrderScreen> {
 
   @override
   void dispose() {
+    currentScreen.dispose();
     channel?.sink.close();
     super.dispose();
   }
+
+  final ValueNotifier<int> currentScreen = ValueNotifier(0);
+  final PageController controller = PageController();
 
   @override
   Widget build(BuildContext context) {
@@ -77,9 +82,6 @@ class _OrderScreenState extends ConsumerState<OrderScreen> {
       channel!.sink.close();
     }
 
-    final ValueNotifier<int> currentScreen = ValueNotifier(0);
-    final PageController controller = PageController();
-
     final Map<int, Widget> viewSelector = {
       0: PendingOrderScreen(
         orders: allOrders.pendingOrders,
@@ -96,6 +98,9 @@ class _OrderScreenState extends ConsumerState<OrderScreen> {
           )
         : allOrders.pendingOrders.isEmpty
             ? viewSelector[1]!
+                .animate()
+                .fadeIn(duration: 700.ms)
+                .moveY(duration: 700.ms, begin: -20, end: 0)
             : Stack(
                 alignment: Alignment.topCenter,
                 children: [
@@ -207,6 +212,9 @@ class _OrderScreenState extends ConsumerState<OrderScreen> {
                     },
                   )
                 ],
-              );
+              )
+                .animate()
+                .fadeIn(duration: 700.ms)
+                .moveY(duration: 700.ms, begin: -20, end: 0);
   }
 }

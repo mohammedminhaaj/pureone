@@ -21,15 +21,16 @@ class ProductQuantity {
 }
 
 class Product {
-  Product({
-    this.image,
-    required this.name,
-    required this.displayName,
-    required this.vendor,
-    this.description,
-    required List<dynamic> availableQuantities,
-    this.deletedAt,
-  }) : availableQuantities = availableQuantities
+  Product(
+      {this.image,
+      required this.name,
+      required this.displayName,
+      required this.vendor,
+      this.description,
+      required List<dynamic> availableQuantities,
+      this.deletedAt,
+      this.rating})
+      : availableQuantities = availableQuantities
             .map((item) => ProductQuantity.fromJson(item))
             .toList();
 
@@ -40,6 +41,7 @@ class Product {
   final String? description;
   final List<ProductQuantity> availableQuantities;
   final String? deletedAt;
+  final double? rating;
 
   factory Product.empty() {
     return Product(
@@ -59,6 +61,7 @@ class Product {
             : Vendor.empty(),
         availableQuantities: json["product_quantity"] ?? [],
         deletedAt: json["deleted_at"],
+        rating: json["rating"],
         description: json["description"]);
   }
 }

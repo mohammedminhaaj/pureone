@@ -28,6 +28,18 @@ class OrderNotifier extends StateNotifier<AllOrders> {
       //Ignore StateErrors
     }
   }
+
+  void markFeedbackCompleted(String orderId) {
+    final List<Order> previousOrders = state.previousOrders;
+    try {
+      final Order orderToUpdate =
+          previousOrders.singleWhere((element) => element.orderId == orderId);
+      orderToUpdate.feedbackCompleted = true;
+      state = state.copyWith(previousOrders: previousOrders);
+    } on StateError {
+      //Ignore state errors
+    }
+  }
 }
 
 final orderProvider =

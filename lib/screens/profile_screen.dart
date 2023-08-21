@@ -43,7 +43,7 @@ class ProfileScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text("Hello,", style: TextStyle(fontSize: 40)),
+                    const Text("Hello,", style: TextStyle(fontSize: 25)),
                     Text(
                       store.username,
                       style: TextStyle(

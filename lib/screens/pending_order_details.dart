@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pureone/models/order.dart';
 import 'package:pureone/models/vendor.dart';
 import 'package:pureone/providers/order_provider.dart';
+import 'package:pureone/widgets/elevated_container.dart';
 import 'package:pureone/widgets/pending_order_status.dart';
 import 'package:pureone/widgets/pending_order_vendor_details.dart';
 import 'package:pureone/widgets/pending_order_map.dart';
-import 'package:pureone/widgets/pending_order_section.dart';
 
 class PendingOrderDetails extends ConsumerWidget {
   const PendingOrderDetails(
@@ -70,7 +70,9 @@ class PendingOrderDetails extends ConsumerWidget {
                         const SizedBox(
                           height: 10,
                         ),
-                        PendingOrderSection(
+                        ElevatedContainer(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 20),
                           child: InkWell(
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(25)),

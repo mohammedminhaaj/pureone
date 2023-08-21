@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pureone/models/vendor.dart';
-import 'package:pureone/widgets/pending_order_section.dart';
+import 'package:pureone/widgets/elevated_container.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PendingOrderVendorDetails extends StatelessWidget {
@@ -10,7 +10,8 @@ class PendingOrderVendorDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PendingOrderSection(
+    return ElevatedContainer(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(

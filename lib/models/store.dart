@@ -34,6 +34,10 @@ class Store {
   @HiveField(6, defaultValue: 0)
   int preferredPaymentMode;
 
+  //used to determine if the firebase cloud messaging token has been stored in the backend
+  @HiveField(7, defaultValue: false)
+  bool fcmTokenStored;
+
   Store(
       {this.authToken = "",
       this.onboardingCompleted = false,
@@ -41,5 +45,6 @@ class Store {
       this.username = "",
       this.savedAddresses = const [],
       this.userEmail = "",
-      this.preferredPaymentMode = 0});
+      this.preferredPaymentMode = 0,
+      this.fcmTokenStored = false});
 }

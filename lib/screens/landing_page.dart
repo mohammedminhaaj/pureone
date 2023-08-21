@@ -1,12 +1,20 @@
+import 'dart:io';
+
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pureone/models/store.dart';
 import 'package:pureone/models/user.dart';
 import 'package:pureone/providers/user_location_provider.dart';
 import 'package:pureone/screens/cart_screen.dart';
 import 'package:pureone/screens/home_screen.dart';
 import 'package:pureone/screens/order_screen.dart';
 import 'package:pureone/screens/profile_screen.dart';
+import 'package:pureone/settings.dart';
 import 'package:pureone/widgets/bottom_nav_bar/bottom_nav_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import 'package:pureone/widgets/select_address_modal.dart';
 
@@ -20,6 +28,48 @@ class LandingPage extends StatefulWidget {
 }
 
 class _LandingPageState extends State<LandingPage> {
+  void setupPushNotification() async {
+    final fcm = FirebaseMessaging.instance;
+    final NotificationSettings settings = await fcm.getNotificationSettings();
+    if (settings.authorizationStatus == AuthorizationStatus.notDetermined) {
+      await fcm.requestPermission();
+    }
+    final Box<Store> box = Hive.box<Store>("store");
+    final Store store = box.get("storeObj", defaultValue: Store())!;
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized &&
+        !store.fcmTokenStored) {
+      final Uri url = Uri.http(baseUrl, "/api/common/add-fcm-token/");
+      final String authToken = store.authToken;
+      http
+          .post(url,
+              body: json.encode({
+                "registration_id": await fcm.getToken(),
+                "platform": Platform.isAndroid
+                    ? "android"
+                    : Platform.isIOS
+                        ? "ios"
+                        : "web"
+              }),
+              headers: getAuthorizationHeaders(authToken))
+          .then((response) {
+        if (response.statusCode < 400) {
+          store.fcmTokenStored = true;
+          box.put("storeObj", store);
+        } else {
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(
+                const SnackBar(content: Text("Something went wrong")));
+        }
+      }).onError((error, stackTrace) {
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(const SnackBar(content: Text("Something went wrong")));
+      });
+    }
+  }
+
   Widget renderScreen(String screenName) {
     Map<String, Widget> screenMap = {
       "Home": const HomeScreen(),
@@ -36,6 +86,7 @@ class _LandingPageState extends State<LandingPage> {
   @override
   void initState() {
     super.initState();
+    setupPushNotification();
     currentScreen = widget.redirectTo;
   }
 

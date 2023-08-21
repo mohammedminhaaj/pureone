@@ -63,11 +63,11 @@ class _CheckoutOverlayState extends ConsumerState<CheckoutOverlay> {
               ScaffoldMessenger.of(context)
                   .showSnackBar(SnackBar(content: Text(data["details"])));
             } else {
-              ref.read(cartProvider.notifier).clearCart();
               Navigator.of(context, rootNavigator: true)
                   .pushReplacement(MaterialPageRoute(
                 builder: (context) => const OrderPlaced(),
               ));
+              ref.read(cartProvider.notifier).clearCart();
             }
           });
         }
@@ -80,6 +80,12 @@ class _CheckoutOverlayState extends ConsumerState<CheckoutOverlay> {
         }
         break;
     }
+  }
+
+  @override
+  void dispose() {
+    isLoading.dispose();
+    super.dispose();
   }
 
   @override
@@ -173,9 +179,11 @@ class _CheckoutOverlayState extends ConsumerState<CheckoutOverlay> {
                                           curve: Curves.ease);
                                     }
                                   }
-                                : () {
-                                    placeOrder(preferredPaymentMode, store);
-                                  },
+                                : isLoading
+                                    ? () {}
+                                    : () {
+                                        placeOrder(preferredPaymentMode, store);
+                                      },
                             icon: const Icon(
                                 Icons.shopping_cart_checkout_rounded),
                             label: isLoading

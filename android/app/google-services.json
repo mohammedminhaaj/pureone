@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "199824761353",
+    "project_id": "meaterian-cc6b4",
+    "storage_bucket": "meaterian-cc6b4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:199824761353:android:626c76bcc88a86c6640ed8",
+        "android_client_info": {
+          "package_name": "com.example.pureone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "199824761353-k79tikp8srgrm3e4mq6apcugbfpuurm6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMRs3KtJKohCBvpCIaI9zwURxfoftxo1o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "199824761353-k79tikp8srgrm3e4mq6apcugbfpuurm6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
